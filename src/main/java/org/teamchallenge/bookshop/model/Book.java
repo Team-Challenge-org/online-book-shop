@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -20,13 +20,15 @@ public class Book {
     @NonNull
     private String description;
     @NonNull
-    private float price;
-    @ManyToMany
-    @JoinTable(
-            name = "authors_books",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private List<Author> authors;
+    private BigDecimal price;
+
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+
 
 }
