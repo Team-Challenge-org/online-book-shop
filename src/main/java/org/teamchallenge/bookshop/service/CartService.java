@@ -9,11 +9,9 @@ import java.util.Optional;
 
 public interface CartService {
 
-
     Cart createCart(Cart cart);
 
     Optional<Cart> getCartById(Long id);
-
 
     Cart updateCart(Cart cart);
 
@@ -21,12 +19,9 @@ public interface CartService {
 
     Cart addBookToCart(Long cartId, Book book);
 
-
     Cart removeBookFromCart(Long cartId, Long bookId);
 
-
     BigDecimal calculateTotal(Long cartId);
-
 
     List<Cart> getAllCarts();
 }
