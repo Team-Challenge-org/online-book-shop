@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,14 +22,9 @@ public class Book {
     private String description;
     @NonNull
     private BigDecimal price;
-
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
-
-
+    @NonNull
+    private String category;
+    private String imageUrl;
+    @NonNull
+    private LocalDate timeAdded;
 }
