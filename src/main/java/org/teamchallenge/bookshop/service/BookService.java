@@ -2,6 +2,7 @@ package org.teamchallenge.bookshop.service;
 
 import org.teamchallenge.bookshop.model.Book;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public interface BookService {
 
     void deleteBook(Long id);
 
-    List<Book> getAllBooks();
+    List<Book> getAllBooks(Pageable pageable);
 
-    List<Book> findBooksByTitle(String title);
+    Optional<Book> findBooksByTitle(String title);
 }
