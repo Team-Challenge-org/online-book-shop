@@ -1,41 +1,45 @@
 package org.teamchallenge.bookshop.service.Impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.model.User;
+import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    //TODO: use DTO
+    private final UserRepository userRepository;
     @Override
     public Optional<User> getUserById(Long id) {
-        // TODO
-        return Optional.empty();
+        return Optional.of(userRepository.findById(id)).orElseThrow(NotFoundException::new);
     }
 
     @Override
     public User updateUser(User user) {
-        // TODO
-        return null;
+        userRepository.findById(user.getId()).orElseThrow(NotFoundException::new);
+        return userRepository.save(user);
     }
 
     @Override
     public void deleteUser(Long id) {
-        // TODO
-         }
+        User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
+        userRepository.delete(user);
+
+    }
 
     @Override
     public List<User> getAllUsers() {
-            // TODO
-        return null;
+        return userRepository.findAll();
     }
-
 
     @Override
     public Optional<User> findUserByEmail(String email) {
-        // TODO
-        return Optional.empty();
+        return userRepository.findByEmail(email);
     }
 }

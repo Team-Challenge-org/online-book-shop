@@ -1,7 +1,6 @@
 package org.teamchallenge.bookshop.service.Impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.model.Book;
@@ -31,8 +30,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book updateBook(Book book) {
         bookRepository.findById(book.getId()).orElseThrow(NotFoundException::new);
-        bookRepository.save(book);
-        return null;
+        return bookRepository.save(book);
     }
 
     @Override
