@@ -15,6 +15,12 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     //TODO: use DTO
     private final UserRepository userRepository;
+
+    @Override
+    public User createUser (User user) {
+        return userRepository.save(user);
+    }
+
     @Override
     public Optional<User> getUserById(Long id) {
         return Optional.of(userRepository.findById(id)).orElseThrow(NotFoundException::new);
@@ -28,9 +34,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
-        userRepository.delete(user);
-
+        userRepository.findById(id).orElseThrow(NotFoundException::new);
+        userRepository.deleteById(id);
     }
 
     @Override

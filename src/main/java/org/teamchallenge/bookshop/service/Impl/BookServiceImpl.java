@@ -35,8 +35,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void deleteBook(Long id) {
-        Book b = bookRepository.findById(id).orElseThrow(NotFoundException::new);
-        bookRepository.delete(b);
+        bookRepository.findById(id).orElseThrow(NotFoundException::new);
+        bookRepository.deleteById(id);
     }
 
     @Override
