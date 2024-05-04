@@ -1,8 +1,7 @@
 package org.teamchallenge.bookshop.service;
 
-import org.teamchallenge.bookshop.model.Book;
-
 import org.springframework.data.domain.Pageable;
+import org.teamchallenge.bookshop.model.Book;
 
 import java.util.List;
 import java.util.Optional;

@@ -2,16 +2,12 @@ package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.engine.internal.Cascade;
 import org.teamchallenge.bookshop.enums.Role;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter

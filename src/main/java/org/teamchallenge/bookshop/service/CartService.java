@@ -1,10 +1,8 @@
 package org.teamchallenge.bookshop.service;
 
 import org.teamchallenge.bookshop.model.Cart;
-import org.teamchallenge.bookshop.model.Book;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 public interface CartService {
