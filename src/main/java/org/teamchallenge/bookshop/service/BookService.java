@@ -2,13 +2,14 @@ package org.teamchallenge.bookshop.service;
 
 import org.teamchallenge.bookshop.model.Book;
 
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
 
-    Book createBook(Book book);
+    void createBook(Book book);
 
     Optional<Book> getBookById(Long id);
 

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.engine.internal.Cascade;
 import org.teamchallenge.bookshop.enums.Role;
 
 import java.math.BigDecimal;
@@ -33,10 +34,8 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> favourites = new ArrayList<>();
     @OneToOne
-    @NonNull
     private Cart cart;
-    @NonNull
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "users_orders",
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "order_id"))

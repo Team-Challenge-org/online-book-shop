@@ -13,14 +13,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    //TODO: use DTO
     private final UserRepository userRepository;
-
-    @Override
-    public User createUser (User user) {
-        return userRepository.save(user);
-    }
-
     @Override
     public Optional<User> getUserById(Long id) {
         return Optional.of(userRepository.findById(id)).orElseThrow(NotFoundException::new);

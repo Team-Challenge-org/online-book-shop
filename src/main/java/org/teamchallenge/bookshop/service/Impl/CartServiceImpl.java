@@ -18,10 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    @Override
-    public Cart createCart(Cart cart) {
-        return cartRepository.save(cart);
-    }
+    private final BookRepository bookRepository;
 
     @Override
     public Optional<Cart> getCartById(Long id) {
@@ -41,8 +38,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart addBookToCart(Long cartId, Book book, int amount) {
+    public Cart addBookToCart(Long cartId, Long bookId, int amount) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(NotFoundException::new);
+        Book book = bookRepository.findById(bookId).orElseThrow(NotFoundException::new);
         Map<Book, Integer> items = cart.getItems();
         items.compute(book, (key, value) -> (value == null) ? amount : value + amount);
         cart.setItems(items);
@@ -50,8 +48,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart removeBookFromCart(Long cartId, Book book, int amount) {
+    public Cart removeBookFromCart(Long cartId, Long bookId, int amount) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(NotFoundException::new);
+        Book book = bookRepository.findById(bookId).orElseThrow(NotFoundException::new);
         Map<Book, Integer> items = cart.getItems();
         if (items.containsKey(book)) {
             items.put(book, Math.max(items.get(book) - amount, 0));
@@ -70,10 +69,5 @@ public class CartServiceImpl implements CartService {
                 .stream()
                 .map(entry -> entry.getKey().getPrice().multiply(BigDecimal.valueOf(entry.getValue())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    @Override
-    public List<Cart> getAllCarts() {
-        return cartRepository.findAll();
     }
 }

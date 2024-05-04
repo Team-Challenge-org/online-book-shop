@@ -6,8 +6,8 @@ import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
+import org.springframework.data.domain.Pageable;
 
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +17,8 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     // TODO: Use DTO instead of model
     @Override
-    public Book createBook(Book book) {
+    public void createBook(Book book) {
         bookRepository.save(book);
-        return book;
     }
 
     @Override
@@ -41,7 +40,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getAllBooks(Pageable pageable) {;
-        return bookRepository.findAll(pageable);
+        return bookRepository.findAll(pageable).stream().toList();
     }
 
     @Override
