@@ -1,9 +1,8 @@
 package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,6 +11,9 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "books")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,7 @@ public class Book {
     @NonNull
     private String category;
     private String imageUrl;
-    @NonNull
+    @CreationTimestamp
     private LocalDate timeAdded;
+
 }
