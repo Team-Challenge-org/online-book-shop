@@ -61,7 +61,8 @@ public class BookServiceImpl implements BookService {
         List<BookDto> bookDtoList = bookPage.getContent().stream()
                 .map(bookMapper::bookToBookDto)
                 .collect(Collectors.toList());
-
+        return new PageImpl<>(bookDtoList, pageable, bookPage.getTotalElements());
+    }
         return new PageImpl<>(bookDtoList, pageable, bookPage.getTotalElements());
     }
 

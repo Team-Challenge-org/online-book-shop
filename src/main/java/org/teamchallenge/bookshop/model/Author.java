@@ -15,7 +15,7 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String fullName;
-    @ManyToMany
+    @ManyToMany (cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(
             name = "authors_books",
             joinColumns = @JoinColumn(name = "author_id"),

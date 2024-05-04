@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.exception.ErrorObject;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
-
 import java.util.Date;
-
 import static org.teamchallenge.bookshop.constants.ValidationConstants.*;
 
 @ControllerAdvice

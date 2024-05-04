@@ -2,7 +2,6 @@ package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.teamchallenge.bookshop.enums.Role;
@@ -31,10 +30,8 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> favourites = new ArrayList<>();
     @OneToOne
-    @NonNull
     private Cart cart;
-    @NonNull
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "users_orders",
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "order_id"))
