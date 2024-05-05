@@ -63,8 +63,6 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
         return new PageImpl<>(bookDtoList, pageable, bookPage.getTotalElements());
     }
-        return new PageImpl<>(bookDtoList, pageable, bookPage.getTotalElements());
-    }
 
         @Override
         public BookDto findBooksByTitle(String title) {

@@ -7,6 +7,7 @@ import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.model.Cart;
+import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.repository.CartRepository;
 import org.teamchallenge.bookshop.service.CartService;
 
@@ -19,7 +20,6 @@ import java.util.Optional;
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final BookRepository bookRepository;
-
     @Override
     public Optional<Cart> getCartById(Long id) {
         return Optional.of(cartRepository.findById(id)).orElseThrow(UserNotFoundException::new);
@@ -37,16 +37,18 @@ public class CartServiceImpl implements CartService {
         cartRepository.deleteById(id);
     }
 
-    public Cart addBookToCart(Long cartId, Book book, int amount) {
+    public Cart addBookToCart(Long cartId, Long bookId, int amount) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(UserNotFoundException::new);
+        Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         Map<Book, Integer> items = cart.getItems();
         items.compute(book, (key, value) -> (value == null) ? amount : value + amount);
         cart.setItems(items);
         return cartRepository.save(cart);
     }
 
-   public Cart removeBookFromCart(Long cartId, Book book, int amount) {
+   public Cart removeBookFromCart(Long cartId, Long bookId, int amount) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(NotFoundException::new);
+        Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         Map<Book, Integer> items = cart.getItems();
         if (items.containsKey(book)) {
             items.put(book, Math.max(items.get(book) - amount, 0));
