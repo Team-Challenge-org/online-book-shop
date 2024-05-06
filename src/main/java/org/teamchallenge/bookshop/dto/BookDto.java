@@ -1,16 +1,22 @@
 package org.teamchallenge.bookshop.dto;
 
 
+
+import lombok.*;
+
 import java.math.BigDecimal;
-
-public record BookDto(
-         long id,
-         String title,
-         String description,
-         BigDecimal price,
-         String category,
-         String imageUrl
-) {
-
-
+import java.time.LocalDate;
+@Getter
+@Setter
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+public class BookDto {
+    private long id;
+    private String title;
+    private String description;
+    private BigDecimal price;
+    private String category;
+    private String imageUrl;
+    private LocalDate timeAdded;
 }

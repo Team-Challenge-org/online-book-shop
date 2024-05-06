@@ -1,6 +1,6 @@
 package org.teamchallenge.bookshop.service.Impl;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +17,7 @@ import org.teamchallenge.bookshop.service.AuthService;
 
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -31,7 +31,9 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(Role.USER);
         userRepository.save(user);
-        return new AuthenticationResponse(JwtService.generateJWT(user.getEmail()));
+        return  AuthenticationResponse.builder()
+                .token(JwtService.generateJWT(user.getEmail()))
+                .build();
     }
 
     @Override
@@ -43,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
         User user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow(UserNotFoundException::new);
-        return new AuthenticationResponse(JwtService.generateJWT(user.getEmail()));
+        return AuthenticationResponse.builder()
+                .token(JwtService.generateJWT(user.getEmail()))
+                .build();
     }
 }

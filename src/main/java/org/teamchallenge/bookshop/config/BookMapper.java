@@ -5,11 +5,9 @@ import org.mapstruct.factory.Mappers;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.model.Book;
 
-
 @Mapper
 public interface BookMapper {
     BookMapper BOOK_MAPPER = Mappers.getMapper(BookMapper.class);
-    BookDto bookToBookDto(Book book);
-    Book bookDtotoBook(BookDto bookDto);
-
+    BookDto entityToDTO(Book book);
+    Book dtoToEntity(BookDto bookDto);
 }

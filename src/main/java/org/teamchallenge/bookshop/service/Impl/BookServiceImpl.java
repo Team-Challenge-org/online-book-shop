@@ -23,30 +23,30 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void addBook(BookDto bookDto) {
-        Book book = bookMapper.bookDtotoBook(bookDto);
+        Book book = bookMapper.dtoToEntity(bookDto);
         bookRepository.save(book);
     }
 
     @Override
     public BookDto getBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
-        return bookMapper.bookToBookDto(book);
+        return bookMapper.entityToDTO(book);
     }
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
-        Book book = bookRepository.findById(bookDto.id()).orElseThrow(BookNotFoundException::new);
+        Book book = bookRepository.findById(bookDto.getId()).orElseThrow(BookNotFoundException::new);
         Book updatedBook = Book.builder()
-                .id(bookDto.id())
+                .id(bookDto.getId())
                 .title(book.getTitle())
-                .description(bookDto.description())
-                .category(bookDto.category())
-                .price(bookDto.price())
-                .imageUrl(bookDto.imageUrl())
+                .description(bookDto.getDescription())
+                .category(bookDto.getCategory())
+                .price(bookDto.getPrice())
+                .imageUrl(bookDto.getImageUrl())
                 .timeAdded(book.getTimeAdded())
                 .build();
         bookRepository.save(updatedBook);
-        return bookMapper.bookToBookDto(updatedBook);
+        return bookMapper.entityToDTO(updatedBook);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class BookServiceImpl implements BookService {
     public Page<BookDto> getAllBooks(Pageable pageable) {
         Page<Book> bookPage = bookRepository.findAll(pageable);
         List<BookDto> bookDtoList = bookPage.getContent().stream()
-                .map(bookMapper::bookToBookDto)
+                .map(bookMapper::entityToDTO)
                 .collect(Collectors.toList());
         return new PageImpl<>(bookDtoList, pageable, bookPage.getTotalElements());
     }
@@ -67,7 +67,7 @@ public class BookServiceImpl implements BookService {
         @Override
         public BookDto findBooksByTitle(String title) {
             Book book = bookRepository.findByTitle(title).orElseThrow(BookNotFoundException::new);
-            return bookMapper.bookToBookDto(book);
+            return bookMapper.entityToDTO(book);
         }
 
 }
