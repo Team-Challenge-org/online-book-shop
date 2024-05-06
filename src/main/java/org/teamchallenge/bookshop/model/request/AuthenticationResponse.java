@@ -1,4 +1,4 @@
-package org.teamchallenge.bookshop.controller.request;
+package org.teamchallenge.bookshop.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthenticationResponse {
     private String token;
-
 }

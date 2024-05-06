@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.teamchallenge.bookshop.controller.request.AuthRequest;
-import org.teamchallenge.bookshop.controller.request.AuthenticationResponse;
-import org.teamchallenge.bookshop.controller.request.RegisterRequest;
+import org.teamchallenge.bookshop.model.request.AuthRequest;
+import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
+import org.teamchallenge.bookshop.model.request.RegisterRequest;
 import org.teamchallenge.bookshop.service.AuthService;
 
 @RestController
