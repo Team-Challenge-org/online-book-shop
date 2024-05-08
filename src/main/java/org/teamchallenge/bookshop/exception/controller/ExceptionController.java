@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.exception.ErrorObject;
+import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
 
 import java.util.Date;
@@ -41,7 +42,12 @@ public class ExceptionController {
         return handleException(e, BAD_REQUEST_ERROR_OCCURRED, HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(BookNotFoundException.class)
-    public ResponseEntity<ErrorObject> bookNotFound(BookNotFoundException  e) {
+    public ResponseEntity<ErrorObject> bookNotFoundHandler(BookNotFoundException e) {
         return handleException(e, BOOK_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorObject> userAlreadyExistsHandler(UserAlreadyExistsException e) {
+        return handleException(e, USER_ALREADY_EXISTS, HttpStatus.CONFLICT);
     }
 }
