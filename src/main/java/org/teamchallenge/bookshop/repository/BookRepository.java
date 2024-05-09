@@ -6,6 +6,5 @@ import org.teamchallenge.bookshop.model.Book;
 import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book,Long> {
-
-    Optional<Book> findByTitle  (String title);
+    Optional<Book> findByTitle (String title);
 }

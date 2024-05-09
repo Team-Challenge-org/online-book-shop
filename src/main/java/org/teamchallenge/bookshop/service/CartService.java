@@ -1,15 +1,12 @@
 package org.teamchallenge.bookshop.service;
 
+
 import org.teamchallenge.bookshop.model.Cart;
-import org.teamchallenge.bookshop.model.Book;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 public interface CartService {
-
-    Cart createCart(Cart cart);
 
     Optional<Cart> getCartById(Long id);
 
@@ -17,11 +14,11 @@ public interface CartService {
 
     void deleteCart(Long id);
 
-    Cart addBookToCart(Long cartId, Book book);
 
-    Cart removeBookFromCart(Long cartId, Long bookId);
+    Cart addBookToCart(Long cartId, Long bookId, int amount);
+
+    Cart removeBookFromCart(Long cartId, Long bookId, int amount);
+
 
     BigDecimal calculateTotal(Long cartId);
-
-    List<Cart> getAllCarts();
 }

@@ -1,21 +1,20 @@
 package org.teamchallenge.bookshop.service;
 
-import org.teamchallenge.bookshop.model.Book;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.teamchallenge.bookshop.dto.BookDto;
 
 public interface BookService {
 
-    Book createBook(Book book);
+    void addBook(BookDto book);
 
-    Optional<Book> getBookById(Long id);
+    BookDto getBookById(Long id);
 
-    Book updateBook(Book book);
+    BookDto updateBook(BookDto bookDto);
 
     void deleteBook(Long id);
 
-    List<Book> getAllBooks();
+    Page<BookDto> getAllBooks(Pageable pageable);
 
-    List<Book> findBooksByTitle(String title);
+    BookDto findBooksByTitle(String title);
 }

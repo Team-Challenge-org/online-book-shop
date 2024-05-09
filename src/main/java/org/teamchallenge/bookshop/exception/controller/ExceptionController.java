@@ -1,27 +1,53 @@
 package org.teamchallenge.bookshop.exception.controller;
-import org.teamchallenge.bookshop.exception.NotFoundException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.teamchallenge.bookshop.exception.BookNotFoundException;
+import org.teamchallenge.bookshop.exception.ErrorObject;
+import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
+import org.teamchallenge.bookshop.exception.UserNotFoundException;
+
+import java.util.Date;
+
+import static org.teamchallenge.bookshop.constants.ValidationConstants.*;
 
 @ControllerAdvice
 @Slf4j
 public class ExceptionController {
 
-    @ExceptionHandler(NotFoundException.class)
-    ResponseEntity<String> notFoundHandler(NotFoundException e) {
-        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    private ErrorObject createErrorObject(String message, HttpStatus status) {
+        ErrorObject errorObject = new ErrorObject();
+        errorObject.setStatusCode(status.value());
+        errorObject.setMessage(message);
+        errorObject.setTimestamp(new Date());
+        return errorObject;
     }
 
-     ResponseEntity<String> returnResponse(String message, HttpStatus status) {
-        log.error(message);
-        return ResponseEntity.status(status).body(message);
+    private ResponseEntity<ErrorObject> handleException(Exception e, String logMessage, HttpStatus status) {
+        log.error(logMessage, e);
+        ErrorObject errorObject = createErrorObject(e.getMessage(), status);
+        return new ResponseEntity<>(errorObject, status);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorObject> notFoundHandler(UserNotFoundException e) {
+        return handleException(e, NOT_FOUND_ERROR_OCCURRED, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    ResponseEntity<String> badRequestHandler(IllegalStateException e) {
-        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorObject> badRequestHandler(IllegalStateException e) {
+        return handleException(e, BAD_REQUEST_ERROR_OCCURRED, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<ErrorObject> bookNotFoundHandler(BookNotFoundException e) {
+        return handleException(e, BOOK_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorObject> userAlreadyExistsHandler(UserAlreadyExistsException e) {
+        return handleException(e, USER_ALREADY_EXISTS, HttpStatus.CONFLICT);
     }
 }
