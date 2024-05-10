@@ -14,11 +14,9 @@ public interface CartService {
 
     void deleteCart(Long id);
 
-
     Cart addBookToCart(Long cartId, Long bookId, int amount);
 
     Cart removeBookFromCart(Long cartId, Long bookId, int amount);
-
 
     BigDecimal calculateTotal(Long cartId);
 }

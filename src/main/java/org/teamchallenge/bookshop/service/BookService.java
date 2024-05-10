@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.teamchallenge.bookshop.dto.BookDto;
 
+import java.util.List;
+
 public interface BookService {
 
     void addBook(BookDto book);
@@ -14,7 +16,9 @@ public interface BookService {
 
     void deleteBook(Long id);
 
-    Page<BookDto> getAllBooks(Pageable pageable);
+    List<BookDto> getAllBooks();
 
     BookDto findBooksByTitle(String title);
+
+    List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax);
 }

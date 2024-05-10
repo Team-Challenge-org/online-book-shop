@@ -3,6 +3,7 @@ package org.teamchallenge.bookshop.dto;
 
 
 import lombok.*;
+import org.teamchallenge.bookshop.model.Author;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,4 +20,5 @@ public class BookDto {
     private String category;
     private String imageUrl;
     private LocalDate timeAdded;
+    private Author author;
 }
