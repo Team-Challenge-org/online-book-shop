@@ -1,11 +1,14 @@
 package org.teamchallenge.bookshop.repository;
 
-import org.springframework.data.domain.Sort;
+import lombok.NonNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
+import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.model.Book;
+import org.springframework.data.domain.Page;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +27,10 @@ public interface BookRepository extends JpaRepository<Book,Long> {
                 " CASE WHEN :sortPrice = 'ASC' THEN b.price END ASC," +
                 " CASE WHEN :sortPrice = 'DESC' THEN b.price END DESC")
         List<Book> findSorted(@Param("authorName") String authorName,
-                              @Param("category") String category,
+                              @Param("category") Category category,
                               @Param("sortTimeAdded") String sortTimeAdded,
                               @Param("sortPrice") String sortPrice,
                               @Param("priceMax") Float priceMax,
                               @Param("priceMin") Float priceMin);
-
+    @NonNull Page<Book> findAll(@NonNull Pageable pageable);
 }
