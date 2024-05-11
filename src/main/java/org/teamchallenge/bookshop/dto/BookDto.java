@@ -7,6 +7,8 @@ import org.teamchallenge.bookshop.model.Author;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -20,5 +22,5 @@ public class BookDto {
     private String category;
     private String imageUrl;
     private LocalDate timeAdded;
-    private Author author;
+    private List<Author> authors;
 }
