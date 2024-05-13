@@ -3,6 +3,7 @@ package org.teamchallenge.bookshop.dto;
 
 
 import lombok.*;
+import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.model.Author;
 
 import java.math.BigDecimal;
@@ -17,7 +18,7 @@ public class BookDto {
     private String title;
     private String description;
     private BigDecimal price;
-    private String category;
+    private Category category;
     private String imageUrl;
     private LocalDate timeAdded;
     private Author author;
