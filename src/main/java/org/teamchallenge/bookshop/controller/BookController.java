@@ -34,7 +34,10 @@ public class BookController {
         BookDto bookDto = bookService.getBookById(id);
         return ResponseEntity.ok(bookDto);
     }
-
+    @GetMapping("/all")
+    public ResponseEntity<List<BookDto>> getAllBooks() {
+        return ResponseEntity.ok(bookService.getAllBooks());
+    }
     @GetMapping("/filter")
     public ResponseEntity<List<BookDto>> getFilteredBooks(@RequestParam (required = false) Category category ,
                                                           @RequestParam (required = false) String time_added,
