@@ -23,4 +23,5 @@ public class BookDto {
     private String imageUrl;
     private LocalDate timeAdded;
     private List<Author> authors;
+    private List<String> images;
 }
