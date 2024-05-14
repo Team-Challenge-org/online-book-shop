@@ -11,5 +11,9 @@ public class MapperConfig {
     public BookMapper bookMapper() {
         return BookMapper.BOOK_MAPPER;
     }
+    @Bean
+    public CatalogMapper CatalogMapper() {
+        return CatalogMapper.CATALOG_MAPPER;
+    }
 
 }

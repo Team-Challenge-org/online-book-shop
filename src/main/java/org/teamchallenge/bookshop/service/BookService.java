@@ -3,10 +3,9 @@ package org.teamchallenge.bookshop.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.enums.Category;
-import org.teamchallenge.bookshop.model.Book;
 
-import java.util.Comparator;
 import java.util.List;
 
 public interface BookService {
@@ -21,9 +20,12 @@ public interface BookService {
 
     List<BookDto> getAllBooks();
 
-    BookDto findBooksByTitle(String title);
+    BookInCatalogDto findBooksByTitle(String title);
+
+    Page<BookInCatalogDto> getFiveBooksForSlider(Pageable paging);
 
     Page<BookDto> getBookByTimeAdded(Pageable paging);
 
     List<BookDto> getSorted(Category category, String timeAdded, String price, String author, Float priceMin, Float priceMax);
+
 }

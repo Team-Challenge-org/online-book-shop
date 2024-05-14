@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import static org.teamchallenge.bookshop.constants.ValidationConstants.*;
-import static org.teamchallenge.bookshop.constants.ValidationConstants.WRONG_PASSWORD_CREATION_MESSAGE;
 
 @Data
 @AllArgsConstructor

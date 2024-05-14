@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
@@ -68,9 +69,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-        public BookDto findBooksByTitle(String title) {
+        public BookInCatalogDto findBooksByTitle(String title) {
             Book book = bookRepository.findByTitle(title).orElseThrow(BookNotFoundException::new);
-            return bookMapper.entityToDTO(book);
+            return bookMapper.entityToCatalogDTO(book);
         }
 
     @Override
@@ -109,5 +110,12 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findSorted(author, category, timeAdded, price, priceMax, priceMin)
                 .stream().map(bookMapper::entityToDTO).toList();
     }
+
+    @Override
+    public Page<BookInCatalogDto> getFiveBooksForSlider(Pageable paging) {
+        Page<Book> allOfBooks = bookRepository.findAll(paging);
+        return  allOfBooks.map(bookMapper::entityToCatalogDTO);
+    }
+
 
 }
