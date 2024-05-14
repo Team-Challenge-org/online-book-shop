@@ -2,6 +2,8 @@ package org.teamchallenge.bookshop.service.Impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.teamchallenge.bookshop.config.AuthorMapper;
+import org.teamchallenge.bookshop.dto.AuthorDto;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.model.Author;
 import org.teamchallenge.bookshop.repository.AuthorRepository;
@@ -13,21 +15,24 @@ import java.util.Optional;
 @Service
 public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
+    private final AuthorMapper authorMapper;
 
     @Override
-    public void createAuthor(Author author) {
-        authorRepository.save(author);
+    public void createAuthor(AuthorDto author) {
+        authorRepository.save(authorMapper.dtoToEntity(author));
     }
 
     @Override
-    public Optional<Author> findById(Long id) {
-        return Optional.of(authorRepository.findById(id)).orElseThrow(NotFoundException::new);
+    public Optional<AuthorDto> findById(Long id) {
+        Author author = authorRepository.findById(id).orElseThrow(NotFoundException::new);
+        return Optional.of(authorMapper.entityToDTO(author));
     }
 
     @Override
-    public Author updateAuthor(Author author) {
-        authorRepository.findById(author.getId()).orElseThrow(NotFoundException::new);
-        return authorRepository.save(author);
+    public AuthorDto updateAuthor(AuthorDto author) {
+        Author auth = authorRepository.findById(author.getId()).orElseThrow(NotFoundException::new);
+        Author newAuthor = authorMapper.dtoToEntity(author);
+        return authorMapper.entityToDTO(authorRepository.save(newAuthor));
     }
 
     @Override

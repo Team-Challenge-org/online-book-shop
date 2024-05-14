@@ -1,15 +1,16 @@
 package org.teamchallenge.bookshop.service;
 
+import org.teamchallenge.bookshop.dto.AuthorDto;
 import org.teamchallenge.bookshop.model.Author;
 
 import java.util.Optional;
 
 public interface AuthorService {
-    void createAuthor(Author author);
+    void createAuthor(AuthorDto author);
 
-    Optional<Author> findById(Long id);
+    Optional<AuthorDto> findById(Long id);
 
-    Author updateAuthor(Author author);
+    AuthorDto updateAuthor(AuthorDto author);
 
     void deleteAuthor(Long id);
 }
