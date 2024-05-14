@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("api/v1/book")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(maxAge = 3600, origins = "*")
+//@CrossOrigin(maxAge = 3600, origins = "*")
 public class BookController {
     private final BookService bookService;
 
