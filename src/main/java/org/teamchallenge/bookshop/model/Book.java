@@ -37,4 +37,6 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
     private List<Author> authors;
+    @Column(columnDefinition = "TEXT")
+    private List<String> images;
 }
