@@ -27,18 +27,18 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable).cors(withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(withDefaults())
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers(
+                        auth -> auth
+                                .requestMatchers(
                                         "api/v1/auth/**",
-                                "api/v1/**"
+                                        "api/v1/**"
                                 )
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
-                .httpBasic().disable()
-                .formLogin().disable()
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
