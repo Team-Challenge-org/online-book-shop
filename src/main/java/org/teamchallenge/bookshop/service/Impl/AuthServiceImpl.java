@@ -17,7 +17,6 @@ import org.teamchallenge.bookshop.repository.CartRepository;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
-import org.teamchallenge.bookshop.service.CartService;
 
 
 @Service
