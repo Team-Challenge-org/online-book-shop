@@ -1,7 +1,9 @@
 package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.teamchallenge.bookshop.enums.Role;
 

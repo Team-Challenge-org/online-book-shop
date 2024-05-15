@@ -1,7 +1,6 @@
 package org.teamchallenge.bookshop.service.Impl;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.User;

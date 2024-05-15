@@ -1,7 +1,6 @@
 package org.teamchallenge.bookshop.service.Impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
@@ -10,7 +9,6 @@ import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +31,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<BookDto> getRandomByCount(Integer count) {
+        return bookRepository.getRandom(count).stream().map(bookMapper::entityToDTO).toList();
+    }
+
+    @Override
     public BookDto updateBook(BookDto bookDto) {
         Book book = bookRepository.findById(bookDto.getId()).orElseThrow(BookNotFoundException::new);
         Book updatedBook = Book.builder()
@@ -41,7 +44,6 @@ public class BookServiceImpl implements BookService {
                 .description(bookDto.getDescription())
                 .category(bookDto.getCategory())
                 .price(bookDto.getPrice())
-                .imageUrl(bookDto.getImageUrl())
                 .timeAdded(book.getTimeAdded())
                 .build();
         bookRepository.save(updatedBook);
@@ -68,25 +70,25 @@ public class BookServiceImpl implements BookService {
             return bookMapper.entityToDTO(book);
         }
 
-    @Override
-    public List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax) {
-        List<Sort.Order> orderList = new ArrayList<>();
-        if (timeAdded != null) {
-            if (timeAdded.equals("ASC")) {
-                orderList.add(new Sort.Order(Sort.Direction.ASC, "timeAdded"));
-            } else {
-                orderList.add(new Sort.Order(Sort.Direction.DESC, "timeAdded"));
-            }
-        }
-        if (price != null) {
-            if (price.equals("ASC")) {
-                orderList.add(new Sort.Order(Sort.Direction.ASC, "price"));
-            } else {
-                orderList.add(new Sort.Order(Sort.Direction.DESC, "price"));
-            }
-        }
-        return bookRepository.findSorted(author, category, timeAdded, price, priceMax, priceMin)
-                .stream().map(bookMapper::entityToDTO).toList();
-    }
+//    @Override
+//    public List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax) {
+//        List<Sort.Order> orderList = new ArrayList<>();
+//        if (timeAdded != null) {
+//            if (timeAdded.equals("ASC")) {
+//                orderList.add(new Sort.Order(Sort.Direction.ASC, "timeAdded"));
+//            } else {
+//                orderList.add(new Sort.Order(Sort.Direction.DESC, "timeAdded"));
+//            }
+//        }
+//        if (price != null) {
+//            if (price.equals("ASC")) {
+//                orderList.add(new Sort.Order(Sort.Direction.ASC, "price"));
+//            } else {
+//                orderList.add(new Sort.Order(Sort.Direction.DESC, "price"));
+//            }
+//        }
+//        return bookRepository.findSorted(category, timeAdded, price, priceMax, priceMin)
+//                .stream().map(bookMapper::entityToDTO).toList();
+//    }
 
 }

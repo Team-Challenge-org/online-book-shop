@@ -27,16 +27,12 @@ public class Book {
     private BigDecimal price;
     @NonNull
     private String category;
-    private String imageUrl;
     @CreationTimestamp
     private LocalDate timeAdded;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "authors_books",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private List<Author> authors;
+    private String authors;
     @Column(columnDefinition = "TEXT")
+    private String titleImage;
+    @Column(columnDefinition = "TEXT")
+    @ElementCollection
     private List<String> images;
 }
