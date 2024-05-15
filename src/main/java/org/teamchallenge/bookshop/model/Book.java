@@ -30,7 +30,6 @@ public class Book {
     @NonNull
     private BigDecimal price;
     @NonNull
-
     @Enumerated(EnumType.STRING)
     private Category category;
     @Enumerated(EnumType.STRING)

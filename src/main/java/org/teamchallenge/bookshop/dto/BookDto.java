@@ -3,6 +3,7 @@ package org.teamchallenge.bookshop.dto;
 
 
 import lombok.*;
+import org.teamchallenge.bookshop.enums.Available;
 import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.model.Author;
 
@@ -20,7 +21,7 @@ public class BookDto {
     private String short_description;
     private BigDecimal price;
     private Category category;
+    private Available available;
     private String imageUrl;
-    private LocalDate timeAdded;
     private String author;
 }
