@@ -44,7 +44,6 @@ public class BookServiceImpl implements BookService {
         Book updatedBook = Book.builder()
                 .id(bookDto.getId())
                 .title(book.getTitle())
-                .full_description(bookDto.getDescription())
                 .category(bookDto.getCategory())
                 .price(bookDto.getPrice())
                 .imageUrl(bookDto.getImageUrl())

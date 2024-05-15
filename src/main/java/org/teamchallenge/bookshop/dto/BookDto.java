@@ -16,10 +16,11 @@ import java.time.LocalDate;
 public class BookDto {
     private long id;
     private String title;
-    private String description;
+    private String full_description;
+    private String short_description;
     private BigDecimal price;
     private Category category;
     private String imageUrl;
     private LocalDate timeAdded;
-    private Author author;
+    private String author;
 }

@@ -17,6 +17,5 @@ public record BookInCatalogDto(
         Category category,
         Available available,
         String imageUrl,
-        @JsonIgnore
-        List<Author> authors
+        String authors
 ) {}
