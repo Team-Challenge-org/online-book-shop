@@ -1,22 +1,17 @@
 package org.teamchallenge.bookshop.service.Impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
-import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +31,11 @@ public class BookServiceImpl implements BookService {
     public BookDto getBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
         return bookMapper.entityToDTO(book);
+    }
+
+    @Override
+    public List<BookDto> getRandomByCount(Integer count) {
+        return bookRepository.getRandom(count).stream().map(bookMapper::entityToDTO).toList();
     }
 
     @Override
@@ -69,29 +69,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-        public BookInCatalogDto findBooksByTitle(String title) {
+        public BookInCatalogDto getBookByTitle(String title) {
             Book book = bookRepository.findByTitle(title).orElseThrow(BookNotFoundException::new);
             return bookMapper.entityToCatalogDTO(book);
         }
 
     @Override
-    public Page<BookDto> getBookByTimeAdded(Pageable paging) {
-        Comparator<Book> comparator = Comparator.comparing(Book::getTimeAdded);
-        return getBookPage(paging, comparator);
-    }
-
-    private Page<BookDto> getBookPage(Pageable paging, Comparator<Book> comparator) {
-        Page<Book> bookPage = bookRepository.findAll(paging);
-        List<BookDto> bookDtoList = bookPage.getContent()
-                .stream()
-                .sorted(comparator.reversed())
-                .map(bookMapper::entityToDTO)
-                .collect(Collectors.toList());
-        return new PageImpl<>(bookDtoList, paging, bookPage.getTotalElements());
-    }
-
-    @Override
-    public List<BookDto> getSorted(Category category, String timeAdded, String price, String author, Float priceMin, Float priceMax) {
+    public List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax) {
         List<Sort.Order> orderList = new ArrayList<>();
         if (timeAdded != null) {
             if (timeAdded.equals("ASC")) {
@@ -107,15 +91,8 @@ public class BookServiceImpl implements BookService {
                 orderList.add(new Sort.Order(Sort.Direction.DESC, "price"));
             }
         }
-        return bookRepository.findSorted(author, category, timeAdded, price, priceMax, priceMin)
+        return bookRepository.findSorted(category, timeAdded, price, priceMax, priceMin)
                 .stream().map(bookMapper::entityToDTO).toList();
     }
-
-    @Override
-    public Page<BookInCatalogDto> getFiveBooksForSlider(Pageable paging) {
-        Page<Book> allOfBooks = bookRepository.findAll(paging);
-        return  allOfBooks.map(bookMapper::entityToCatalogDTO);
-    }
-
 
 }

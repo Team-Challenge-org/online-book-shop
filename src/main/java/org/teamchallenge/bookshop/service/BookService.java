@@ -1,18 +1,19 @@
 package org.teamchallenge.bookshop.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
-import org.teamchallenge.bookshop.enums.Category;
 
 import java.util.List;
 
+@Service
 public interface BookService {
 
     void addBook(BookDto book);
 
     BookDto getBookById(Long id);
+
+    List<BookDto> getRandomByCount(Integer count);
 
     BookDto updateBook(BookDto bookDto);
 
@@ -20,12 +21,7 @@ public interface BookService {
 
     List<BookDto> getAllBooks();
 
-    BookInCatalogDto findBooksByTitle(String title);
+    BookInCatalogDto getBookByTitle(String title);
 
-    Page<BookInCatalogDto> getFiveBooksForSlider(Pageable paging);
-
-    Page<BookDto> getBookByTimeAdded(Pageable paging);
-
-    List<BookDto> getSorted(Category category, String timeAdded, String price, String author, Float priceMin, Float priceMax);
-
+    List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax);
 }

@@ -1,23 +1,20 @@
 package org.teamchallenge.bookshop.repository;
 
-import lombok.NonNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.teamchallenge.bookshop.enums.Category;
+import org.springframework.stereotype.Repository;
 import org.teamchallenge.bookshop.model.Book;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface BookRepository extends JpaRepository<Book,Long> {
     Optional<Book> findByTitle (String title);
 
         @Query("SELECT b FROM Book b" +
-                " LEFT JOIN b.authors a WHERE (a.fullName = :authorName OR a IS NULL)" +
-                " AND (:category IS NULL OR b.category = :category)" +
+                " WHERE (:category IS NULL OR b.category = :category)" +
                 " AND (:priceMax IS NULL OR b.price < :priceMax)" +
                 " AND (:priceMin IS NULL OR b.price > :priceMin)" +
                 " ORDER BY" +
@@ -25,15 +22,13 @@ public interface BookRepository extends JpaRepository<Book,Long> {
                 " CASE WHEN :sortTimeAdded = 'DESC' THEN b.timeAdded END DESC," +
                 " CASE WHEN :sortPrice = 'ASC' THEN b.price END ASC," +
                 " CASE WHEN :sortPrice = 'DESC' THEN b.price END DESC")
-        List<Book> findSorted(@Param("authorName") String authorName,
-                              @Param("category") Category category,
+        List<Book> findSorted(@Param("category") String category,
                               @Param("sortTimeAdded") String sortTimeAdded,
                               @Param("sortPrice") String sortPrice,
                               @Param("priceMax") Float priceMax,
                               @Param("priceMin") Float priceMin);
-    @NonNull Page<Book> findAll(@NonNull Pageable pageable);
 
-    @Query("SELECT DISTINCT b FROM Book b JOIN FETCH b.authors")
-    List<Book> findAllWithAuthors();
-//    List<Book> findFirst5ByOrderByPriceDesc(Pageable pageable);
+    @Query(value = "SELECT b FROM Book b ORDER BY RANDOM() LIMIT :count")
+    List<Book> getRandom(@Param("count") Integer count);
+
 }
