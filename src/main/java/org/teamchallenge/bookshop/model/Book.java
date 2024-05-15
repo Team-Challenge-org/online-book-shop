@@ -9,7 +9,6 @@ import org.teamchallenge.bookshop.enums.Category;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
@@ -41,11 +40,5 @@ public class Book {
     private String imageUrl;
     @CreationTimestamp
     private LocalDate timeAdded;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "authors_books",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private List<Author> authors;
+    private String authors;
 }
