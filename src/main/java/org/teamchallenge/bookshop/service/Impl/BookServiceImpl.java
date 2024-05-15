@@ -69,7 +69,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
         public BookInCatalogDto getBookByTitle(String title) {
-            Book book = bookRepository.findByTitle(title).orElseThrow(BookNotFoundException::new);
+            Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
             return bookMapper.entityToCatalogDTO(book);
         }
 

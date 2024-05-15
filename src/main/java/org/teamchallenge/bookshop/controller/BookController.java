@@ -26,7 +26,7 @@ public class BookController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/findById/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         BookDto bookDto = bookService.getBookById(id);
         return ResponseEntity.ok(bookDto);
@@ -36,7 +36,7 @@ public class BookController {
     public ResponseEntity<List<BookDto>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
-    @GetMapping("/{title}")
+    @GetMapping("/findByTitle/{title}")
     public ResponseEntity<BookInCatalogDto> getBookByTitle(@PathVariable String title) {
         BookInCatalogDto bookDto = bookService.getBookByTitle(title);
         return ResponseEntity.ok(bookDto);

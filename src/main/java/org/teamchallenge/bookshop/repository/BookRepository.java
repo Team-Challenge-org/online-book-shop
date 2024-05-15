@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book,Long> {
-    Optional<Book> findByTitle (String title);
+    Optional<Book> findByTitleIgnoreCase (String title);
 
         @Query("SELECT b FROM Book b" +
                 " WHERE (:category IS NULL OR b.category = :category)" +
