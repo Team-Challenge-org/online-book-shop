@@ -9,9 +9,8 @@ import org.teamchallenge.bookshop.model.Book;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface BookRepository extends JpaRepository<Book, Long> {
-    Optional<Book> findByTitle(String title);
+public interface BookRepository extends JpaRepository<Book,Long> {
+    Optional<Book> findByTitleIgnoreCase (String title);
 
     @Query("SELECT b FROM Book b ORDER BY RANDOM() LIMIT :count")
     List<Book> getRandom(@Param("count") Integer count);

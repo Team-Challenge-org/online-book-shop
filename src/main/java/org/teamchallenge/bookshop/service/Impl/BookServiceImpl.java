@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
@@ -47,7 +48,6 @@ public class BookServiceImpl implements BookService {
         Book updatedBook = Book.builder()
                 .id(bookDto.getId())
                 .title(book.getTitle())
-                .description(bookDto.getDescription())
                 .category(bookDto.getCategory())
                 .price(bookDto.getPrice())
                 .timeAdded(book.getTimeAdded())
@@ -71,9 +71,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-        public BookDto findBooksByTitle(String title) {
-            Book book = bookRepository.findByTitle(title).orElseThrow(BookNotFoundException::new);
-            return bookMapper.entityToDTO(book);
+        public BookInCatalogDto findBookByTitle(String title) {
+            Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
+            return bookMapper.entityToCatalogDTO(book);
         }
 
     @Override

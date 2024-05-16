@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.service.BookService;
 
 import java.util.List;
@@ -25,9 +26,19 @@ public class BookController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/findById/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         BookDto bookDto = bookService.getBookById(id);
+        return ResponseEntity.ok(bookDto);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<BookDto>> getAllBooks() {
+        return ResponseEntity.ok(bookService.getAllBooks());
+    }
+    @GetMapping("/findByTitle/{title}")
+    public ResponseEntity<BookInCatalogDto> getBookByTitle(@PathVariable String title) {
+        BookInCatalogDto bookDto = bookService.getBookByTitle(title);
         return ResponseEntity.ok(bookDto);
     }
 
