@@ -22,5 +22,5 @@ public interface BookService {
 
     BookDto findBooksByTitle(String title);
 
-//    List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax);
+    List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax);
 }

@@ -30,17 +30,17 @@ public class BookController {
         BookDto bookDto = bookService.getBookById(id);
         return ResponseEntity.ok(bookDto);
     }
-//
-//    @GetMapping("/filter")
-//    public ResponseEntity<List<BookDto>> getFilteredBooks(@RequestParam (required = false) String category ,
-//                                                          @RequestParam (required = false) String time_added,
-//                                                          @RequestParam (required = false) String price,
-//                                                          @RequestParam (required = false) String author,
-//                                                          @RequestParam (required = false) Float price_min,
-//                                                          @RequestParam (required = false) Float price_max) {
-//        List<BookDto> bookDtos = bookService.getSorted(category, time_added, price, author, price_min, price_max);
-//        return ResponseEntity.ok(bookDtos);
-//    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<BookDto>> getFilteredBooks(@RequestParam (required = false) String category ,
+                                                          @RequestParam (required = false) String time_added,
+                                                          @RequestParam (required = false) String price,
+                                                          @RequestParam (required = false) String author,
+                                                          @RequestParam (required = false) Float price_min,
+                                                          @RequestParam (required = false) Float price_max) {
+        List<BookDto> bookDtos = bookService.getSorted(category, time_added, price, author, price_min, price_max);
+        return ResponseEntity.ok(bookDtos);
+    }
 
     @GetMapping("/slider")
     public ResponseEntity<List<BookDto>> getRandomBooks(@RequestParam Integer count) {
