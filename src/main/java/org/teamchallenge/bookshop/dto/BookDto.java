@@ -22,7 +22,7 @@ public class BookDto {
     private BigDecimal price;
     private Category category;
     private Available available;
-    private String imageUrl;
+    private String titleImage;
     private String author;
     private LocalDate timeAdded;
     private List<String> images;

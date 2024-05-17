@@ -26,7 +26,6 @@ public class Book {
     private String title;
     @NonNull
     private String full_description;
-
     private String short_description;
     @NonNull
     private BigDecimal price;
@@ -36,7 +35,6 @@ public class Book {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'IN_STOCK'")
     private Available available;
-    private String imageUrl;
     @CreationTimestamp
     private LocalDate timeAdded;
     private String authors;
