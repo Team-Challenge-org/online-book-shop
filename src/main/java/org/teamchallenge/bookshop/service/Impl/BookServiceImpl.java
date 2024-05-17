@@ -1,7 +1,9 @@
 package org.teamchallenge.bookshop.service.Impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Override
     public void addBook(BookDto bookDto) {
@@ -44,9 +48,7 @@ public class BookServiceImpl implements BookService {
         Book updatedBook = Book.builder()
                 .id(bookDto.getId())
                 .title(book.getTitle())
-                .category(bookDto.getCategory())
                 .price(bookDto.getPrice())
-                .imageUrl(bookDto.getImageUrl())
                 .timeAdded(book.getTimeAdded())
                 .build();
         bookRepository.save(updatedBook);
@@ -68,30 +70,53 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-        public BookInCatalogDto getBookByTitle(String title) {
-            Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
-            return bookMapper.entityToCatalogDTO(book);
-        }
+    public BookInCatalogDto getBookByTitle(String title) {
+        Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
+        return bookMapper.entityToCatalogDTO(book);
+    }
 
     @Override
-    public List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax) {
-        List<Sort.Order> orderList = new ArrayList<>();
+    public List<BookDto> getSorted(String category,
+                                   String timeAdded,
+                                   String price,
+                                   String author,
+                                   Float priceMin,
+                                   Float priceMax) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
+        Root<Book> root = query.from(Book.class);
+        List<Order> orders = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>();
+        if (category != null) {
+            predicates.add(criteriaBuilder.equal(root.get("category"), category));
+        }
+        if (priceMin != null) {
+            predicates.add(criteriaBuilder.ge(root.get("priceMin"), priceMin));
+        }
+        if (priceMax != null) {
+            predicates.add(criteriaBuilder.le(root.get("priceMax"), priceMax));
+        }
+        query.where(predicates.toArray(new Predicate[0]));
         if (timeAdded != null) {
-            if (timeAdded.equals("ASC")) {
-                orderList.add(new Sort.Order(Sort.Direction.ASC, "timeAdded"));
+            if (timeAdded.equalsIgnoreCase("asc")) {
+                orders.add(criteriaBuilder.asc(root.get("timeAdded")));
             } else {
-                orderList.add(new Sort.Order(Sort.Direction.DESC, "timeAdded"));
+                orders.add(criteriaBuilder.desc(root.get("timeAdded")));
             }
         }
         if (price != null) {
-            if (price.equals("ASC")) {
-                orderList.add(new Sort.Order(Sort.Direction.ASC, "price"));
+           if (price.equalsIgnoreCase("asc")) {
+                orders.add(criteriaBuilder.asc(root.get("price")));
             } else {
-                orderList.add(new Sort.Order(Sort.Direction.DESC, "price"));
+                orders.add(criteriaBuilder.desc(root.get("price")));
             }
         }
-        return bookRepository.findSorted(category, timeAdded, price, priceMax, priceMin)
-                .stream().map(bookMapper::entityToDTO).toList();
+        query.orderBy(orders);
+        return entityManager.createQuery(query)
+                    .getResultList()
+                    .stream()
+                    .map(bookMapper::entityToDTO)
+                    .toList();
     }
 
 }
