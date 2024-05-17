@@ -17,8 +17,6 @@ public class UserDetailsImpl implements UserDetailsService {
 
     private UserRepository userRepository;
 
-
-
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email)   {
