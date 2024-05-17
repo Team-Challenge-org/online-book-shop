@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/book")
+@CrossOrigin(maxAge = 3600, origins = "*")
 @RequiredArgsConstructor
 @Slf4j
 public class BookController {
