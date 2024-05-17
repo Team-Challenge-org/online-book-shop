@@ -48,7 +48,6 @@ public class BookServiceImpl implements BookService {
         Book updatedBook = Book.builder()
                 .id(bookDto.getId())
                 .title(book.getTitle())
-                .category(bookDto.getCategory())
                 .price(bookDto.getPrice())
                 .timeAdded(book.getTimeAdded())
                 .build();
@@ -71,10 +70,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-        public BookInCatalogDto findBookByTitle(String title) {
-            Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
-            return bookMapper.entityToCatalogDTO(book);
-        }
+    public BookInCatalogDto getBookByTitle(String title) {
+        Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
+        return bookMapper.entityToCatalogDTO(book);
+    }
 
     @Override
     public List<BookDto> getSorted(String category,
