@@ -17,7 +17,8 @@ public class Slider {
     private long id;
     @Column(columnDefinition = "TEXT")
     private String titleImage;
+    private String bookName;
     public SliderDto convertToDto() {
-        return new SliderDto(id,titleImage);
+        return new SliderDto(id,titleImage,bookName);
     }
 }
