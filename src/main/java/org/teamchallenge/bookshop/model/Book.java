@@ -25,6 +25,7 @@ public class Book {
     @NonNull
     private String title;
     @NonNull
+    @Column(columnDefinition = "TEXT")
     private String full_description;
     private String short_description;
     @NonNull

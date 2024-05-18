@@ -90,11 +90,14 @@ public class BookServiceImpl implements BookService {
         if (category != null) {
             predicates.add(criteriaBuilder.equal(root.get("category"), category));
         }
+        if (author != null) {
+            predicates.add(criteriaBuilder.equal(root.get("category"), category));
+        }
         if (priceMin != null) {
-            predicates.add(criteriaBuilder.ge(root.get("priceMin"), priceMin));
+            predicates.add(criteriaBuilder.ge(root.get("price"), priceMin));
         }
         if (priceMax != null) {
-            predicates.add(criteriaBuilder.le(root.get("priceMax"), priceMax));
+            predicates.add(criteriaBuilder.le(root.get("price"), priceMax));
         }
         query.where(predicates.toArray(new Predicate[0]));
         if (timeAdded != null) {
@@ -111,6 +114,7 @@ public class BookServiceImpl implements BookService {
                 orders.add(criteriaBuilder.desc(root.get("price")));
             }
         }
+
         query.orderBy(orders);
         return entityManager.createQuery(query)
                     .getResultList()

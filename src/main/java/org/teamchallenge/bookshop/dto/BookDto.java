@@ -23,7 +23,7 @@ public class BookDto {
     private Category category;
     private Available available;
     private String titleImage;
-    private String author;
+    private String authors;
     private LocalDate timeAdded;
     private List<String> images;
 }
