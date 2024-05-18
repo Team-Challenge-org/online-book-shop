@@ -8,22 +8,22 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.teamchallenge.bookshop.dto.CatalogDto;
-import org.teamchallenge.bookshop.service.CatalogService;
+import org.teamchallenge.bookshop.dto.SliderDto;
+import org.teamchallenge.bookshop.service.SliderService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/category")
+@RequestMapping("api/v1/slider")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(maxAge = 3600, origins = "*")
-public class CategoryController {
-    private final CatalogService catalogService;
+public class SliderController {
+    private final SliderService sliderService;
 
-    @Operation(description = "Get all category of books")
+    @Operation(description = "Find all books")
     @GetMapping("/all")
-    public ResponseEntity<List<CatalogDto>> getAllCategory() {
-        return ResponseEntity.ok(catalogService.getAllCategory());
+    public ResponseEntity<List<SliderDto>> getAllBooks() {
+        return ResponseEntity.ok(sliderService.getBooksForSlider());
     }
 }

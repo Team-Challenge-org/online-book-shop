@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @Operation(summary = "Add book to favourites")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/favourites/add")
     public ResponseEntity<Void> addBookToFavourites(@RequestParam Long id) {
@@ -26,6 +28,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
+    @Operation(summary = "Remove book to favourites")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/favourites/delete")
     public ResponseEntity<Void> deleteBookFromFavourites(@RequestParam Long id) {
@@ -33,6 +36,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Show all books in favourites")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/favourites")
     public ResponseEntity<List<BookDto>> getUserFavourites() {

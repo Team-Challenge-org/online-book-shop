@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface OrderService {
     Optional<Order> getOrderById(Long id);
 
-    Order updateOrder(Long id, String status, LocalDateTime time);
+    Order updateOrder(Long id, String status);
 
     void deleteOrder(Long id);
 }

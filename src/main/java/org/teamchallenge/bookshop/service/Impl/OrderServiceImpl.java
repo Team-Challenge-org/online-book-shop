@@ -21,10 +21,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order updateOrder(Long id, String status, LocalDateTime time) {
+    public Order updateOrder(Long id, String status) {
         Order order = orderRepository.findById(id).orElseThrow(NotFoundException::new);
         order.setStatus(status);
-        order.setStatusChange(time);
+        order.setStatusChange(LocalDateTime.now());
         return orderRepository.save(order);
     }
 
