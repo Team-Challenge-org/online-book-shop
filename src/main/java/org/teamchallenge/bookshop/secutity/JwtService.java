@@ -7,13 +7,16 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = System.getenv("SECRET_KEY");
+    private static final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
+            .orElseThrow(SecretKeyNotFoundException::new);
 
     private static final long EXPIRATION_TIME = 1000* 60 * 60 * 24;
     public String extractUsername(String token) {
