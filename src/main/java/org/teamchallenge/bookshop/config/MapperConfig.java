@@ -1,15 +1,17 @@
 package org.teamchallenge.bookshop.config;
 
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.ReportingPolicy;
 
-@Configuration
+@org.mapstruct.MapperConfig(
+        componentModel = "spring",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        implementationPackage = "<PACKAGE_NAME>.impl"
+)
 public class MapperConfig {
-
-    @Bean
-    public BookMapper bookMapper() {
-        return BookMapper.BOOK_MAPPER;
-    }
 
 }

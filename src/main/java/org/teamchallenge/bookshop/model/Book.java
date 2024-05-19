@@ -25,27 +25,23 @@ public class Book {
     @NonNull
     private String title;
     @NonNull
+    @Column(columnDefinition = "TEXT")
     private String full_description;
-
     private String short_description;
     @NonNull
     private BigDecimal price;
     @NonNull
-
     @Enumerated(EnumType.STRING)
     private Category category;
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'IN_STOCK'")
     private Available available;
-
-    private String imageUrl;
     @CreationTimestamp
     private LocalDate timeAdded;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "authors_books",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private List<Author> authors;
+    private String authors;
+    @Column(columnDefinition = "TEXT")
+    private String titleImage;
+    @Column(columnDefinition = "TEXT")
+    @ElementCollection
+    private List<String> images;
 }

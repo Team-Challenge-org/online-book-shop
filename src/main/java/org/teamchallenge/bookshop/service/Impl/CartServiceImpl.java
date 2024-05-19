@@ -36,7 +36,7 @@ public class CartServiceImpl implements CartService {
         cartRepository.findById(id).orElseThrow(UserNotFoundException::new);
         cartRepository.deleteById(id);
     }
-
+    @Override
     public Cart addBookToCart(Long cartId, Long bookId, int amount) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(UserNotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
@@ -45,7 +45,7 @@ public class CartServiceImpl implements CartService {
         cart.setItems(items);
         return cartRepository.save(cart);
     }
-
+    @Override
    public Cart removeBookFromCart(Long cartId, Long bookId, int amount) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(NotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);

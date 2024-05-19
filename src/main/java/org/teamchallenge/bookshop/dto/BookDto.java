@@ -1,13 +1,14 @@
 package org.teamchallenge.bookshop.dto;
 
 
-
 import lombok.*;
+import org.teamchallenge.bookshop.enums.Available;
 import org.teamchallenge.bookshop.enums.Category;
-import org.teamchallenge.bookshop.model.Author;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -16,10 +17,13 @@ import java.time.LocalDate;
 public class BookDto {
     private long id;
     private String title;
-    private String description;
+    private String full_description;
+    private String short_description;
     private BigDecimal price;
     private Category category;
-    private String imageUrl;
+    private Available available;
+    private String titleImage;
+    private String authors;
     private LocalDate timeAdded;
-    private Author author;
+    private List<String> images;
 }

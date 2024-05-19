@@ -1,12 +1,10 @@
 package org.teamchallenge.bookshop.secutity;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,11 +18,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
+
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -33,16 +31,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers(
                                         "api/v1/auth/**",
-                                "api/v1/**"
+                                "api/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/v2/api-docs"
                                 )
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
-                .exceptionHandling(exceptionHandling ->
-                exceptionHandling
-                        .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_NOT_FOUND, "URL not found")))
-
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

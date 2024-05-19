@@ -5,10 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.teamchallenge.bookshop.exception.BookNotFoundException;
-import org.teamchallenge.bookshop.exception.ErrorObject;
-import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
-import org.teamchallenge.bookshop.exception.UserNotFoundException;
+import org.teamchallenge.bookshop.exception.*;
 
 import java.util.Date;
 
@@ -49,5 +46,10 @@ public class ExceptionController {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorObject> userAlreadyExistsHandler(UserAlreadyExistsException e) {
         return handleException(e, USER_ALREADY_EXISTS, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    public ResponseEntity<ErrorObject> userNotAuthenticatedHandler(UserNotAuthenticatedException e) {
+        return handleException(e, USER_NOT_AUTHENTICATED, HttpStatus.UNAUTHORIZED);
     }
 }
