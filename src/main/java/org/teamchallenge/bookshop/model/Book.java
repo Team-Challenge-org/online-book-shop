@@ -39,9 +39,8 @@ public class Book {
     @CreationTimestamp
     private LocalDate timeAdded;
     private String authors;
-    @Column(columnDefinition = "TEXT")
-    private String titleImage;
-    @Column(columnDefinition = "TEXT")
-    @ElementCollection
-    private List<String> images;
+    @OneToOne
+    private Image titleImage;
+    @OneToMany
+    private List<Image> images;
 }

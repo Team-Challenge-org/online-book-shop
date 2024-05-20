@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
+import org.teamchallenge.bookshop.dto.CreateBookDto;
 import org.teamchallenge.bookshop.service.BookService;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class BookController {
     @Operation(summary = "Add a new book")
     //TODO: add @Preauthorize
     @PostMapping("/add")
-    public ResponseEntity<Void> addBook(@RequestBody BookDto bookDto ) {
+    public ResponseEntity<Void> addBook(@RequestBody CreateBookDto bookDto ) {
         bookService.addBook(bookDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
