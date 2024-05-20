@@ -3,13 +3,14 @@ package org.teamchallenge.bookshop.service;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
+import org.teamchallenge.bookshop.dto.CreateBookDto;
 
 import java.util.List;
 
 @Service
 public interface BookService {
 
-    void addBook(BookDto book);
+    void addBook(CreateBookDto book);
 
     BookDto getBookById(Long id);
 
