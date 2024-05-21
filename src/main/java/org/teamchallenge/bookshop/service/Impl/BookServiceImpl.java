@@ -41,11 +41,13 @@ public class BookServiceImpl implements BookService {
         );
         int counter = 1;
         List<String> imageList = new ArrayList<>();
-        for (String s : book.getImages()) {
-            imageList.add(dropboxService.uploadImage(
-                    folderName + "/" + counter++ + ".png",
-                    ImageUtil.base64ToBufferedImage(book.getTitleImage()))
-            );
+        if (!book.getImages().isEmpty()) {
+            for (String s : book.getImages()) {
+                imageList.add(dropboxService.uploadImage(
+                        folderName + "/" + counter++ + ".png",
+                        ImageUtil.base64ToBufferedImage(s))
+                );
+            }
         }
         book.setImages(imageList);
         bookRepository.save(book);

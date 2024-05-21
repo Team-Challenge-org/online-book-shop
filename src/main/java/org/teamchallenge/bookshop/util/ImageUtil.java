@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.util;
 
+import jakarta.xml.bind.DatatypeConverter;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
@@ -16,7 +17,7 @@ public class ImageUtil {
     }
 
     public static BufferedImage base64ToBufferedImage(String base64String) {
-        byte[] imageBytes = Base64.getMimeDecoder().decode(base64String);
+        byte[] imageBytes = DatatypeConverter.parseBase64Binary(base64String);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes)) {
             return ImageIO.read(bais);
         } catch (Exception e) {
@@ -26,7 +27,7 @@ public class ImageUtil {
 
     public static String bufferedImageToBase64(BufferedImage image) {
         try {
-            return Base64.getMimeEncoder().encodeToString(bufferedImageToBytes(image));
+            return DatatypeConverter.printBase64Binary(bufferedImageToBytes(image));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
