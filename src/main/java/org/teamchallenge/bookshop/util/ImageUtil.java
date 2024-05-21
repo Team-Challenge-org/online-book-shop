@@ -16,7 +16,7 @@ public class ImageUtil {
     }
 
     public static BufferedImage base64ToBufferedImage(String base64String) {
-        byte[] imageBytes = Base64.getDecoder().decode(base64String);
+        byte[] imageBytes = Base64.getMimeDecoder().decode(base64String);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes)) {
             return ImageIO.read(bais);
         } catch (Exception e) {
@@ -26,7 +26,7 @@ public class ImageUtil {
 
     public static String bufferedImageToBase64(BufferedImage image) {
         try {
-            return Base64.getEncoder().encodeToString(bufferedImageToBytes(image));
+            return Base64.getMimeEncoder().encodeToString(bufferedImageToBytes(image));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

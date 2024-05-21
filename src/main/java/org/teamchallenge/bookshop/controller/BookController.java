@@ -73,7 +73,7 @@ public class BookController {
 
     @Operation(summary = "Get books for slider")
     @GetMapping("/slider")
-    public ResponseEntity<List<BookInCatalogDto>> getRandomBooks(@RequestParam Integer count) {
+    public ResponseEntity<List<BookInCatalogDto>> getRandomBooks(@RequestParam(defaultValue = "5") Integer count) {
         return ResponseEntity.ok(bookService.getRandomByCount(count));
     }
 }
