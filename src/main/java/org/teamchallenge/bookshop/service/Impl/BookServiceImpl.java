@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
-import org.teamchallenge.bookshop.dto.CreateBookDto;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
-import org.teamchallenge.bookshop.model.Image;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.DropboxService;
@@ -33,26 +31,21 @@ public class BookServiceImpl implements BookService {
     EntityManager entityManager;
 
     @Override
-    public void addBook(CreateBookDto bookDto) {
-        Book book = new Book();
-        book.setAuthors(bookDto.getAuthor());
-        book.setCategory(book.getCategory());
-        book.setPrice(bookDto.getPrice());
-        book.setFull_description(bookDto.getFull_description());
-        book.setTimeAdded(bookDto.getTimeAdded());
-        book.setShort_description(book.getShort_description());
-        BufferedImage titleImage = ImageUtil.base64ToBufferedImage(bookDto.getTitleImage());
-        String folderName = UUID.randomUUID().toString();
+    public void addBook(BookDto bookDto) {
+        Book book = bookMapper.dtoToEntity(bookDto);
+        String folderName = "/" + UUID.randomUUID();
         dropboxService.createFolder(folderName);
-        Image title = resizeAndUpload(folderName + "/title", titleImage);
-        title.setSliderImage(dropboxService.uploadImage(folderName + "/title/slider.png",
-                ImageUtil.resizeImageByHeight(titleImage, 560)));
-        book.setTitleImage(title);
+        book.setTitleImage(dropboxService.uploadImage(
+                folderName + "/title.png",
+                ImageUtil.base64ToBufferedImage(book.getTitleImage()))
+        );
         int counter = 1;
-        List<Image> imageList = new ArrayList<>();
-        for (String s : bookDto.getImages()) {
-            BufferedImage temp = ImageUtil.base64ToBufferedImage(s);
-            imageList.add(resizeAndUpload(folderName + "/image_" + counter++, temp));
+        List<String> imageList = new ArrayList<>();
+        for (String s : book.getImages()) {
+            imageList.add(dropboxService.uploadImage(
+                    folderName + "/" + counter++ + ".png",
+                    ImageUtil.base64ToBufferedImage(book.getTitleImage()))
+            );
         }
         book.setImages(imageList);
         bookRepository.save(book);
@@ -65,8 +58,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> getRandomByCount(Integer count) {
-        return bookRepository.getRandom(count).stream().map(bookMapper::entityToDTO).toList();
+    public List<BookInCatalogDto> getRandomByCount(Integer count) {
+        return bookRepository.getRandom(count)
+                .stream()
+                .map(bookMapper::entityToCatalogDTO)
+                .toList();
     }
 
     @Override
@@ -149,16 +145,4 @@ public class BookServiceImpl implements BookService {
                     .map(bookMapper::entityToDTO)
                     .toList();
     }
-
-    private Image resizeAndUpload(String path, BufferedImage bufferedImage) {
-        Image image = new Image();
-        image.setSmallImage(dropboxService.uploadImage(path + "/small.png",
-                ImageUtil.resizeImageByHeight(bufferedImage, 360)));
-        image.setPageImage(dropboxService.uploadImage(path + "/page.png",
-                ImageUtil.resizeImageByHeight(bufferedImage, 640)));
-        image.setBigImage(dropboxService.uploadImage(path + "/big.png",
-                ImageUtil.resizeImageByHeight(bufferedImage, 850)));
-        return image;
-    }
-
-}
+};

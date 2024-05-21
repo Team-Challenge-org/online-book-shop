@@ -39,8 +39,7 @@ public class Book {
     @CreationTimestamp
     private LocalDate timeAdded;
     private String authors;
-    @OneToOne
-    private Image titleImage;
-    @OneToMany
-    private List<Image> images;
+    private String titleImage;
+    @ElementCollection
+    private List<String> images;
 }
