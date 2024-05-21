@@ -3,8 +3,6 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.*;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.sharing.CreateSharedLinkWithSettingsErrorException;
-import com.dropbox.core.v2.sharing.SharedLinkMetadata;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.service.DropboxService;
 import org.teamchallenge.bookshop.util.ImageUtil;
@@ -13,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 @Service
 public class DropboxServiceImpl implements DropboxService {
@@ -28,9 +25,9 @@ public class DropboxServiceImpl implements DropboxService {
         try {
             client.files().createFolderV2(path);
         } catch (CreateFolderErrorException e) {
-            System.out.println("Error occurred while creating a folder" + e.getMessage());
+            throw new RuntimeException(e);
         } catch (DbxException e) {
-            System.out.println("Dropbox exception:" + Arrays.toString(e.getStackTrace()));
+            throw new RuntimeException(e);
         }
     }
 
@@ -40,7 +37,10 @@ public class DropboxServiceImpl implements DropboxService {
             FileMetadata metadata = client.files().uploadBuilder(path)
                     .withMode(WriteMode.ADD)
                     .uploadAndFinish(in);
-            return client.sharing().createSharedLinkWithSettings(metadata.getPathLower()).getUrl();
+            return client.sharing()
+                    .createSharedLinkWithSettings(metadata.getPathLower())
+                    .getUrl()
+                    .replace("www.dropbox.com", "dl.dropboxusercontent.com");
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (UploadErrorException e) {

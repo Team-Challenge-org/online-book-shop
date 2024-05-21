@@ -31,7 +31,7 @@ public class BookController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Get book by id", description = "Get an existing book by id or else 404 ")
+    @Operation(summary = "Get book by id", description = "Get an existing book by id")
     @GetMapping("/findById/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         BookDto bookDto = bookService.getBookById(id);
@@ -44,7 +44,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
 
-    @Operation(summary = "Find book by title", description = "Get an existing book by title or else 404")
+    @Operation(summary = "Find book by title", description = "Get an existing book by title")
     @GetMapping("/findByTitle/{title}")
     public ResponseEntity<BookInCatalogDto> getBookByTitle(@PathVariable String title) {
         BookInCatalogDto bookDto = bookService.getBookByTitle(title);
@@ -76,5 +76,4 @@ public class BookController {
     public ResponseEntity<List<BookInCatalogDto>> getRandomBooks(@RequestParam Integer count) {
         return ResponseEntity.ok(bookService.getRandomByCount(count));
     }
-
 }
