@@ -17,6 +17,8 @@ public interface UserService {
 
     List<User> getAllUsers();
 
+    User getAuthenticatedUser();
+
     Optional<User> findUserByEmail(String email);
 
     void addBookToFavourites(Long id);
