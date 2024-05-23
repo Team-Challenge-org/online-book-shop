@@ -12,9 +12,13 @@ import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
+import org.teamchallenge.bookshop.service.DropboxService;
+import org.teamchallenge.bookshop.util.ImageUtil;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +26,30 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final DropboxService dropboxService;
     @PersistenceContext
     EntityManager entityManager;
 
     @Override
     public void addBook(BookDto bookDto) {
         Book book = bookMapper.dtoToEntity(bookDto);
+        String folderName = "/" + UUID.randomUUID();
+        dropboxService.createFolder(folderName);
+        book.setTitleImage(dropboxService.uploadImage(
+                folderName + "/title.png",
+                ImageUtil.base64ToBufferedImage(book.getTitleImage()))
+        );
+        int counter = 1;
+        List<String> imageList = new ArrayList<>();
+        if (!book.getImages().isEmpty()) {
+            for (String s : book.getImages()) {
+                imageList.add(dropboxService.uploadImage(
+                        folderName + "/" + counter++ + ".png",
+                        ImageUtil.base64ToBufferedImage(s))
+                );
+            }
+        }
+        book.setImages(imageList);
         bookRepository.save(book);
     }
 
@@ -38,8 +60,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> getRandomByCount(Integer count) {
-        return bookRepository.getRandom(count).stream().map(bookMapper::entityToDTO).toList();
+    public List<BookInCatalogDto> getRandomByCount(Integer count) {
+        return bookRepository.getRandom(count)
+                .stream()
+                .map(bookMapper::entityToCatalogDTO)
+                .toList();
     }
 
     @Override
@@ -122,5 +147,4 @@ public class BookServiceImpl implements BookService {
                     .map(bookMapper::entityToDTO)
                     .toList();
     }
-
-}
+};
