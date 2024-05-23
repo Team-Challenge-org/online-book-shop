@@ -24,13 +24,10 @@ public class Book {
     private long id;
     @NonNull
     private String title;
-    @NonNull
     @Column(columnDefinition = "TEXT")
     private String full_description;
     private String short_description;
-    @NonNull
     private BigDecimal price;
-    @NonNull
     @Enumerated(EnumType.STRING)
     private Category category;
     @Enumerated(EnumType.STRING)
@@ -42,4 +39,5 @@ public class Book {
     private String titleImage;
     @ElementCollection
     private List<String> images;
+
 }
