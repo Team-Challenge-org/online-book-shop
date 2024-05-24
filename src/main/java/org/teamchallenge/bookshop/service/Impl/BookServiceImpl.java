@@ -15,7 +15,6 @@ import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.DropboxService;
 import org.teamchallenge.bookshop.util.ImageUtil;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

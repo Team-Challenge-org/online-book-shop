@@ -5,7 +5,6 @@ import org.teamchallenge.bookshop.dto.CartDto;
 import org.teamchallenge.bookshop.model.Cart;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 public interface CartService {
 

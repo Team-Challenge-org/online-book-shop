@@ -3,7 +3,6 @@ package org.teamchallenge.bookshop.config;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
 import org.teamchallenge.bookshop.dto.CartDto;
 import org.teamchallenge.bookshop.dto.CartItemDto;
 import org.teamchallenge.bookshop.model.Book;

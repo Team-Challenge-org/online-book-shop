@@ -1,10 +1,14 @@
 package org.teamchallenge.bookshop.service.Impl;
+
 import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.files.*;
-import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.CreateFolderErrorException;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.UploadErrorException;
+import com.dropbox.core.v2.files.WriteMode;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.service.DropboxService;
+import org.teamchallenge.bookshop.util.DropboxUtil;
 import org.teamchallenge.bookshop.util.ImageUtil;
 
 import java.awt.image.BufferedImage;
@@ -14,15 +18,10 @@ import java.io.InputStream;
 
 @Service
 public class DropboxServiceImpl implements DropboxService {
-    private static final String TOKEN= System.getenv("DROPBOX_TOKEN");
-    private static final DbxRequestConfig config = DbxRequestConfig
-            .newBuilder("tcl-bookshop")
-            .build();
-    private static final DbxClientV2 client = new DbxClientV2(config, TOKEN);
-
     @Override
     public void createFolder(String path) {
         try {
+            DbxClientV2 client = DropboxUtil.getClient();
             client.files().createFolderV2(path);
         } catch (CreateFolderErrorException e) {
             throw new RuntimeException(e);
@@ -33,14 +32,17 @@ public class DropboxServiceImpl implements DropboxService {
 
     @Override
     public String uploadImage(String path, BufferedImage bufferedImage) {
-        try (InputStream in = new ByteArrayInputStream(ImageUtil.bufferedImageToBytes(bufferedImage))) {
-            FileMetadata metadata = client.files().uploadBuilder(path)
-                    .withMode(WriteMode.ADD)
-                    .uploadAndFinish(in);
-            return client.sharing()
-                    .createSharedLinkWithSettings(metadata.getPathLower())
-                    .getUrl()
-                    .replace("www.dropbox.com", "dl.dropboxusercontent.com");
+        try {
+            DbxClientV2 client = DropboxUtil.getClient();
+            try (InputStream in = new ByteArrayInputStream(ImageUtil.bufferedImageToBytes(bufferedImage))) {
+                FileMetadata metadata = client.files().uploadBuilder(path)
+                        .withMode(WriteMode.ADD)
+                        .uploadAndFinish(in);
+                return client.sharing()
+                        .createSharedLinkWithSettings(metadata.getPathLower())
+                        .getUrl()
+                        .replace("www.dropbox.com", "dl.dropboxusercontent.com");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (UploadErrorException e) {
