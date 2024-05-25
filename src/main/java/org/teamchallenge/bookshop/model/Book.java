@@ -33,6 +33,7 @@ public class Book {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'IN_STOCK'")
     private Available available;
+    private Boolean isThisNotSlider;
     @CreationTimestamp
     private LocalDate timeAdded;
     private String authors;

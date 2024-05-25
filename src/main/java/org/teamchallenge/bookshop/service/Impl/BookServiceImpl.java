@@ -59,9 +59,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookInCatalogDto> getRandomByCount(Integer count) {
-        return bookRepository.getRandom(count)
+    public List<BookInCatalogDto> getBooksForSlider() {
+        return bookRepository.findAll()
                 .stream()
+                .filter(Book::getIsThisNotSlider)
                 .map(bookMapper::entityToCatalogDTO)
                 .toList();
     }
@@ -74,6 +75,7 @@ public class BookServiceImpl implements BookService {
                 .title(book.getTitle())
                 .price(bookDto.getPrice())
                 .timeAdded(book.getTimeAdded())
+                .titleImage(bookDto.getTitleImage())
                 .build();
         bookRepository.save(updatedBook);
         return bookMapper.entityToDTO(updatedBook);
@@ -87,8 +89,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDto> getAllBooks() {
-        return bookRepository.findAll().
-                stream()
+        return bookRepository.findAll()
+                .stream()
+                .filter(book -> book.getIsThisNotSlider() == null || !book.getIsThisNotSlider())
                 .map(bookMapper::entityToDTO)
                 .collect(Collectors.toList());
     }

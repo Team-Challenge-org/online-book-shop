@@ -10,6 +10,7 @@ public record BookInCatalogDto(
         String title,
         BigDecimal price,
         Category category,
+        Boolean isThisNotSlider,
         Available available,
         String titleImage,
         String authors
