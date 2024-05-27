@@ -23,6 +23,7 @@ public class Order {
     private Map<Book, Integer> books = new HashMap<>();
     @NonNull
     private String status;
+    private int amount;
     @NonNull
     private LocalDateTime statusChange;
 }
