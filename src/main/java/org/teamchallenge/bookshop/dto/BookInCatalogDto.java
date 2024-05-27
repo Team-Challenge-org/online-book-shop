@@ -8,11 +8,10 @@ import java.math.BigDecimal;
 public record BookInCatalogDto(
         long id,
         String title,
-        String fullDescription,
-        String shortDescription,
         BigDecimal price,
         Category category,
+        Boolean isThisNotSlider,
         Available available,
-        String imageUrl,
+        String titleImage,
         String authors
 ) {}

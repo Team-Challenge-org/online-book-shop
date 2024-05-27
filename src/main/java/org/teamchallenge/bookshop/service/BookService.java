@@ -13,7 +13,7 @@ public interface BookService {
 
     BookDto getBookById(Long id);
 
-    List<BookDto> getRandomByCount(Integer count);
+    List<BookInCatalogDto> getBooksForSlider();
 
     BookDto updateBook(BookDto bookDto);
 

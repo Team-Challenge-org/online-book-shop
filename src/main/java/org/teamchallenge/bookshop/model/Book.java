@@ -24,24 +24,21 @@ public class Book {
     private long id;
     @NonNull
     private String title;
-    @NonNull
     @Column(columnDefinition = "TEXT")
     private String full_description;
     private String short_description;
-    @NonNull
     private BigDecimal price;
-    @NonNull
     @Enumerated(EnumType.STRING)
     private Category category;
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'IN_STOCK'")
     private Available available;
+    private Boolean isThisNotSlider;
     @CreationTimestamp
     private LocalDate timeAdded;
     private String authors;
-    @Column(columnDefinition = "TEXT")
     private String titleImage;
-    @Column(columnDefinition = "TEXT")
     @ElementCollection
     private List<String> images;
+
 }

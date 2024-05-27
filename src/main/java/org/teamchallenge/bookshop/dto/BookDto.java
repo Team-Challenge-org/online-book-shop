@@ -21,6 +21,7 @@ public class BookDto {
     private String short_description;
     private BigDecimal price;
     private Category category;
+    private Boolean isThisNotSlider;
     private Available available;
     private String titleImage;
     private String authors;
