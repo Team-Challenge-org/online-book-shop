@@ -1,22 +1,23 @@
 package org.teamchallenge.bookshop.service.Impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
-import org.teamchallenge.bookshop.enums.Category;
+import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
+import org.teamchallenge.bookshop.service.DropboxService;
+import org.teamchallenge.bookshop.util.ImageUtil;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,10 +25,30 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final DropboxService dropboxService;
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Override
     public void addBook(BookDto bookDto) {
         Book book = bookMapper.dtoToEntity(bookDto);
+        String folderName = "/" + UUID.randomUUID();
+        dropboxService.createFolder(folderName);
+        book.setTitleImage(dropboxService.uploadImage(
+                folderName + "/title.png",
+                ImageUtil.base64ToBufferedImage(book.getTitleImage()))
+        );
+        int counter = 1;
+        List<String> imageList = new ArrayList<>();
+        if (!book.getImages().isEmpty()) {
+            for (String s : book.getImages()) {
+                imageList.add(dropboxService.uploadImage(
+                        folderName + "/" + counter++ + ".png",
+                        ImageUtil.base64ToBufferedImage(s))
+                );
+            }
+        }
+        book.setImages(imageList);
         bookRepository.save(book);
     }
 
@@ -38,16 +59,23 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<BookInCatalogDto> getBooksForSlider() {
+        return bookRepository.findAll()
+                .stream()
+                .filter(Book::getIsThisNotSlider)
+                .map(bookMapper::entityToCatalogDTO)
+                .toList();
+    }
+
+    @Override
     public BookDto updateBook(BookDto bookDto) {
         Book book = bookRepository.findById(bookDto.getId()).orElseThrow(BookNotFoundException::new);
         Book updatedBook = Book.builder()
                 .id(bookDto.getId())
                 .title(book.getTitle())
-                .description(bookDto.getDescription())
-                .category(bookDto.getCategory())
                 .price(bookDto.getPrice())
-                .imageUrl(bookDto.getImageUrl())
                 .timeAdded(book.getTimeAdded())
+                .titleImage(bookDto.getTitleImage())
                 .build();
         bookRepository.save(updatedBook);
         return bookMapper.entityToDTO(updatedBook);
@@ -61,53 +89,64 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDto> getAllBooks() {
-        return bookRepository.findAll().
-                stream()
-                .map(bookMapper::entityToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-        public BookDto findBooksByTitle(String title) {
-            Book book = bookRepository.findByTitle(title).orElseThrow(BookNotFoundException::new);
-            return bookMapper.entityToDTO(book);
-        }
-
-    @Override
-    public Page<BookDto> getBookByTimeAdded(Pageable paging) {
-        Comparator<Book> comparator = Comparator.comparing(Book::getTimeAdded);
-        return getBookPage(paging, comparator);
-    }
-
-    private Page<BookDto> getBookPage(Pageable paging, Comparator<Book> comparator) {
-        Page<Book> bookPage = bookRepository.findAll(paging);
-        List<BookDto> bookDtoList = bookPage.getContent()
+        return bookRepository.findAll()
                 .stream()
-                .sorted(comparator.reversed())
+                .filter(book -> book.getIsThisNotSlider() == null || !book.getIsThisNotSlider())
                 .map(bookMapper::entityToDTO)
                 .collect(Collectors.toList());
-        return new PageImpl<>(bookDtoList, paging, bookPage.getTotalElements());
     }
 
     @Override
-    public List<BookDto> getSorted(Category category, String timeAdded, String price, String author, Float priceMin, Float priceMax) {
-        List<Sort.Order> orderList = new ArrayList<>();
+    public BookInCatalogDto getBookByTitle(String title) {
+        Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
+        return bookMapper.entityToCatalogDTO(book);
+    }
+
+    @Override
+    public List<BookDto> getSorted(String category,
+                                   String timeAdded,
+                                   String price,
+                                   String author,
+                                   Float priceMin,
+                                   Float priceMax) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
+        Root<Book> root = query.from(Book.class);
+        List<Order> orders = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>();
+        if (category != null) {
+            predicates.add(criteriaBuilder.equal(root.get("category"), category));
+        }
+        if (author != null) {
+            predicates.add(criteriaBuilder.equal(root.get("category"), category));
+        }
+        if (priceMin != null) {
+            predicates.add(criteriaBuilder.ge(root.get("price"), priceMin));
+        }
+        if (priceMax != null) {
+            predicates.add(criteriaBuilder.le(root.get("price"), priceMax));
+        }
+        query.where(predicates.toArray(new Predicate[0]));
         if (timeAdded != null) {
-            if (timeAdded.equals("ASC")) {
-                orderList.add(new Sort.Order(Sort.Direction.ASC, "timeAdded"));
+            if (timeAdded.equalsIgnoreCase("asc")) {
+                orders.add(criteriaBuilder.asc(root.get("timeAdded")));
             } else {
-                orderList.add(new Sort.Order(Sort.Direction.DESC, "timeAdded"));
+                orders.add(criteriaBuilder.desc(root.get("timeAdded")));
             }
         }
         if (price != null) {
-            if (price.equals("ASC")) {
-                orderList.add(new Sort.Order(Sort.Direction.ASC, "price"));
+           if (price.equalsIgnoreCase("asc")) {
+                orders.add(criteriaBuilder.asc(root.get("price")));
             } else {
-                orderList.add(new Sort.Order(Sort.Direction.DESC, "price"));
+                orders.add(criteriaBuilder.desc(root.get("price")));
             }
         }
-        return bookRepository.findSorted(author, category, timeAdded, price, priceMax, priceMin)
-                .stream().map(bookMapper::entityToDTO).toList();
-    }
 
-}
+        query.orderBy(orders);
+        return entityManager.createQuery(query)
+                    .getResultList()
+                    .stream()
+                    .map(bookMapper::entityToDTO)
+                    .toList();
+    }
+};

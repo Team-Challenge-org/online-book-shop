@@ -3,10 +3,12 @@ package org.teamchallenge.bookshop;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
-public class BookShopApplication {
+import java.io.IOException;
 
-	public static void main(String[] args) {
+@SpringBootApplication
+public class BookShopApplication  {
+
+	public static void main(String[] args) throws IOException {
 		SpringApplication.run(BookShopApplication.class, args);
 	}
 

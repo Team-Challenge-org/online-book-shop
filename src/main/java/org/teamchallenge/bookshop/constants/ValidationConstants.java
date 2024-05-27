@@ -11,4 +11,7 @@ public interface ValidationConstants {
     String WRONG_EMAIL_FORMAT = "Wrong email format";
     String NOT_FOUND = "Not found";
     String WRONG_PASSWORD_CREATION_MESSAGE = "The password must consist of at least 6 characters. Contain a number and one capital letter";
+    String USER_NOT_AUTHENTICATED = "User is not authenticated";
+    String SECRET_KEY_NOT_FOUND = "Secret Key in getenv not found";
+    String CART_NOT_FOUND = "Cart not found";
 }

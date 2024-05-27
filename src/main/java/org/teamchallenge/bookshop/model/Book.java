@@ -2,7 +2,10 @@ package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
+import org.teamchallenge.bookshop.enums.Available;
+import org.teamchallenge.bookshop.enums.Category;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,20 +24,21 @@ public class Book {
     private long id;
     @NonNull
     private String title;
-    @NonNull
-    private String description;
-    @NonNull
+    @Column(columnDefinition = "TEXT")
+    private String full_description;
+    private String short_description;
     private BigDecimal price;
-    @NonNull
-    private String category;
-    private String imageUrl;
+    @Enumerated(EnumType.STRING)
+    private Category category;
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'IN_STOCK'")
+    private Available available;
+    private Boolean isThisNotSlider;
     @CreationTimestamp
     private LocalDate timeAdded;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "authors_books",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private List<Author> authors;
+    private String authors;
+    private String titleImage;
+    @ElementCollection
+    private List<String> images;
+
 }
