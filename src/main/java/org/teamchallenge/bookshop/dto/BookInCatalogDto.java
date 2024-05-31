@@ -12,7 +12,7 @@ public record BookInCatalogDto(
         String title,
         BigDecimal price,
         @JsonIgnore Category category,
-        @JsonProperty("categoryName") String categoryName,
+        @JsonProperty("category") String categoryName,
         Boolean isThisSlider,
         Available available,
         String titleImage,

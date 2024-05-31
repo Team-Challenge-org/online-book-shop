@@ -24,7 +24,7 @@ public class BookDto {
     private BigDecimal price;
     @JsonIgnore
     private Category category;
-    @JsonProperty("categoryName")
+    @JsonProperty("category")
     private String categoryName;
     private Boolean isThisNotSlider;
     private Available available;
