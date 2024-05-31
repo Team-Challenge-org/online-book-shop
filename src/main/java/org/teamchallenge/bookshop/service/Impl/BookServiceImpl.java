@@ -17,9 +17,7 @@ import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.DropboxService;
 import org.teamchallenge.bookshop.util.ImageUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -76,9 +74,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookInCatalogDto> getBooksForSlider() {
-            return bookRepository.findAll()
+            return bookRepository.findSliderBooks()
                     .stream()
-                    .filter(Book::getIsThisNotSlider)
                     .map(bookMapper::entityToBookCatalogDTO)
                     .toList();
     }
@@ -105,18 +102,16 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDto> getAllBooks() {
-        return bookRepository.findAll()
+        return bookRepository.findAllBooks()
                 .stream()
-                .filter(book -> book.getIsThisNotSlider() == null || !book.getIsThisNotSlider())
                 .map(bookMapper::entityToDTO)
                 .collect(Collectors.toList());
     }
     @Override
-    public List<CatalogDto> getAllCategory() {
-        return bookRepository.findAll()
-                .stream()
-                .map(bookMapper::entityToCatalogDto)
-                .collect(Collectors.toList());
+    public List<String> getAllCategory() {
+        return Arrays.stream(Category.values())
+                .map(Category::getName)
+                .toList();
     }
     @Override
     public BookInCatalogDto getBookByTitle(String title) {
@@ -135,6 +130,7 @@ public class BookServiceImpl implements BookService {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
         Root<Book> root = query.from(Book.class);
+        root.fetch("images");
         List<Order> orders = new ArrayList<>();
         List<Predicate> predicates = new ArrayList<>();
         if (category != null) {
@@ -172,7 +168,7 @@ public class BookServiceImpl implements BookService {
                     .map(bookMapper::entityToDTO)
                     .toList();
     }
-    public  Category fromName(String name) {
+    private Category fromName(String name) {
         for (Category category : Category.values()) {
             if (category.getName().equalsIgnoreCase(name)) {
                 return category;

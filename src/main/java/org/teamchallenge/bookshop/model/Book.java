@@ -1,10 +1,9 @@
 package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.*;
 import org.teamchallenge.bookshop.enums.Available;
 import org.teamchallenge.bookshop.enums.Category;
 
@@ -34,13 +33,13 @@ public class Book {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'IN_STOCK'")
     private Available available;
-    private Boolean isThisNotSlider;
+    private Boolean isThisSlider;
     @CreationTimestamp
     private LocalDate timeAdded;
     private String authors;
     private String titleImage;
-    @ElementCollection(fetch = FetchType.LAZY)
-    @BatchSize(size = 100)
+    @Fetch(FetchMode.JOIN)
+    @ElementCollection
     private List<String> images;
 
 }

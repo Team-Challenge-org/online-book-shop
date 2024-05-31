@@ -7,6 +7,7 @@ import org.teamchallenge.bookshop.dto.CatalogDto;
 import org.teamchallenge.bookshop.enums.Category;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface BookService {
@@ -16,7 +17,8 @@ public interface BookService {
     BookDto getBookById(Long id);
 
     List<BookInCatalogDto> getBooksForSlider();
-    List<CatalogDto> getAllCategory();
+
+    List<String> getAllCategory();
 
     BookDto updateBook(BookDto bookDto);
 

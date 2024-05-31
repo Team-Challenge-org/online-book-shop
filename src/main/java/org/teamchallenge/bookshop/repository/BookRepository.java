@@ -11,6 +11,12 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book,Long> {
     Optional<Book> findByTitleIgnoreCase (String title);
 
+    @Query("SELECT b FROM Book b LEFT JOIN FETCH b.images WHERE b.isThisSlider = false")
+    List<Book> findAllBooks();
+
+    @Query("SELECT b FROM Book b LEFT JOIN FETCH b.images WHERE b.isThisSlider = true")
+    List<Book> findSliderBooks();
+
     @Query("SELECT b FROM Book b ORDER BY RANDOM() LIMIT :count")
     List<Book> getRandom(@Param("count") Integer count);
 }
