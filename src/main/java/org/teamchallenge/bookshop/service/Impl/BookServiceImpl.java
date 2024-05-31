@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
-import org.teamchallenge.bookshop.dto.CatalogDto;
+import org.teamchallenge.bookshop.dto.CategoryDto;
 import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.exception.*;
 import org.teamchallenge.bookshop.model.Book;
@@ -17,7 +17,10 @@ import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.DropboxService;
 import org.teamchallenge.bookshop.util.ImageUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -108,9 +111,9 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
     }
     @Override
-    public List<String> getAllCategory() {
+    public List<CategoryDto> getAllCategory() {
         return Arrays.stream(Category.values())
-                .map(Category::getName)
+                .map(category -> new CategoryDto(category.getId(), category.getName()))
                 .toList();
     }
     @Override

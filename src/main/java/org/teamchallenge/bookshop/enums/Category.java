@@ -5,23 +5,25 @@ import lombok.Getter;
 
 @Getter
 public enum Category {
-    ARCHITECTURE("Архітектура"),
-    BUSINESS_MARKETING("Бізнес та маркетинг"),
-    DESIGN("Дизайн"),
-    CULINARY("Кулінарія"),
-    CINEMATOGRAPHY("Кінематографія"),
-    ART("Мистецтво"),
-    IT_PROGRAMMING("ІТ та програмування"),
-    FASHION_AND_BEAUTY("Мода та краса"),
-    PHILOSOPHY("Філософія"),
-    PSYCHOLOGY("Психологія"),
-    COMICS("Комікси"),
-    LIFESTYLE("Стиль життя"),
-    UKRAINIAN_AUTHORS("Українські автори");
+    ARCHITECTURE(1, "Архітектура"),
+    BUSINESS_MARKETING(2, "Бізнес та маркетинг"),
+    DESIGN(3, "Дизайн"),
+    CULINARY(4, "Кулінарія"),
+    CINEMATOGRAPHY(5, "Кінематографія"),
+    ART(6, "Мистецтво"),
+    IT_PROGRAMMING(7, "ІТ та програмування"),
+    FASHION_AND_BEAUTY(8, "Мода та краса"),
+    PHILOSOPHY(9, "Філософія"),
+    PSYCHOLOGY(10, "Психологія"),
+    COMICS(11, "Комікси"),
+    LIFESTYLE(12, "Стиль життя"),
+    UKRAINIAN_AUTHORS(13, "Українські автори");
 
+    private final int id;
     private final String name;
 
-    Category(String name) {
+    Category(int id, String name) {
+        this.id = id;
         this.name = name;
     }
 

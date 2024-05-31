@@ -10,12 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
-import org.teamchallenge.bookshop.dto.CatalogDto;
-import org.teamchallenge.bookshop.enums.Category;
+import org.teamchallenge.bookshop.dto.CategoryDto;
 import org.teamchallenge.bookshop.service.BookService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/book")
@@ -41,7 +39,7 @@ public class BookController {
         return ResponseEntity.ok(bookDto);
     }
     @GetMapping("/category/all")
-    public ResponseEntity<List<String>> getAllCategory() {
+    public ResponseEntity<List<CategoryDto>> getAllCategory() {
         return ResponseEntity.ok(bookService.getAllCategory());
     }
 
