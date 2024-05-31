@@ -2,6 +2,7 @@ package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.teamchallenge.bookshop.enums.Available;
@@ -38,7 +39,8 @@ public class Book {
     private LocalDate timeAdded;
     private String authors;
     private String titleImage;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
     private List<String> images;
 
 }

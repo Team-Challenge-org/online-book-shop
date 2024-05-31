@@ -14,4 +14,14 @@ public interface ValidationConstants {
     String USER_NOT_AUTHENTICATED = "User is not authenticated";
     String SECRET_KEY_NOT_FOUND = "Secret Key in getenv not found";
     String CART_NOT_FOUND = "Cart not found";
+    String DROPBOX_IMAGE_NOT_FOUND = "Dropbox image not found";
+    String DROPBOX_FOLDER_NOT_FOUND = "Dropbox image not found";
+    String DROPBOX_FAILED_UPLOAD_IMAGE = "Failed to upload image " ;
+    String MISSING_DROPBOX_ACCESS_TOKEN = " Missing dropbox access token" ;
+    String MISSING_REFRESH_ACCESS_TOKEN = "Missing refresh dropbox  access token " ;
+    String DROPBOX_INVALID_AUTHORIZATION_VALUE = "Invalid authorization value" ;
+    String BOOK_TITLE_WRONG ="Wrong book title";
+    String WRONG_ENUM_CONSTANT = "No enum constant with name:  ";
+    String ERROR_WITH_DROPBOX_COMMUNICATION = "Error while communicating with Dropbox" ;
+    String ORDER_ID_NOT_FOUND = "Order id not found";
 }

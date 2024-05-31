@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.dto.CatalogDto;
+import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.service.BookService;
 
 import java.util.List;
@@ -57,24 +58,24 @@ public class BookController {
     }
 
 
-    @Operation(summary = "Filter books")
-    @GetMapping("/filter")
-    public ResponseEntity<List<BookDto>> getFilteredBooks
-            (@Parameter(description = "Category name")
-             @RequestParam(required = false) String category ,
-             @Parameter(description = "Sort by creating time (ASC/DESC)")
-             @RequestParam(required = false) String time_added,
-             @Parameter(description = "Sort by price (ASC/DESC)")
-             @RequestParam(required = false) String price,
-             @Parameter(description = "Name of author to search")
-             @RequestParam(required = false) String author,
-             @Parameter(description = "Minimum of price value")
-             @RequestParam(required = false) Float price_min,
-             @Parameter(description = "Maximum of price value")
-             @RequestParam(required = false) Float price_max) {
-        List<BookDto> bookDtos = bookService.getSorted(category, time_added, price, author, price_min, price_max);
-        return ResponseEntity.ok(bookDtos);
-    }
+        @Operation(summary = "Filter books")
+        @GetMapping("/filter")
+        public ResponseEntity<List<BookDto>> getFilteredBooks
+                (@Parameter(description = "Category name")
+                 @RequestParam(required = false) String  category ,
+                 @Parameter(description = "Sort by creating time (ASC/DESC)")
+                 @RequestParam(required = false) String time_added,
+                 @Parameter(description = "Sort by price (ASC/DESC)")
+                 @RequestParam(required = false) String price,
+                 @Parameter(description = "Name of author to search")
+                 @RequestParam(required = false) String author,
+                 @Parameter(description = "Minimum of price value")
+                 @RequestParam(required = false) Float price_min,
+                 @Parameter(description = "Maximum of price value")
+                 @RequestParam(required = false) Float price_max) {
+            List<BookDto> bookDtos = bookService.getSorted(category, time_added, price, author, price_min, price_max);
+            return ResponseEntity.ok(bookDtos);
+        }
 
     @Operation(summary = "Get books for slider")
     @GetMapping("/slider")

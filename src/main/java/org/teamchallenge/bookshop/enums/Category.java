@@ -1,7 +1,28 @@
 package org.teamchallenge.bookshop.enums;
 
+
+import lombok.Getter;
+
+@Getter
 public enum Category {
-    ARCHITECTURE,BUSINESS_MARKETING,DESIGN,
-    CULINARY,CINEMATOGRAPHY,ART,IT_PROGRAMMING,FASHION_AND_BEAUTY,
-    PHILOSOPHY,PSYCHOLOGY,COMICS,LIFESTYLE,UKRAINIAN_AUTHORS
+    ARCHITECTURE("Архітектура"),
+    BUSINESS_MARKETING("Бізнес та маркетинг"),
+    DESIGN("Дизайн"),
+    CULINARY("Кулінарія"),
+    CINEMATOGRAPHY("Кінематографія"),
+    ART("Мистецтво"),
+    IT_PROGRAMMING("ІТ та програмування"),
+    FASHION_AND_BEAUTY("Мода та краса"),
+    PHILOSOPHY("Філософія"),
+    PSYCHOLOGY("Психологія"),
+    COMICS("Комікси"),
+    LIFESTYLE("Стиль життя"),
+    UKRAINIAN_AUTHORS("Українські автори");
+
+    private final String name;
+
+    Category(String name) {
+        this.name = name;
     }
+
+}

@@ -7,6 +7,9 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadErrorException;
 import com.dropbox.core.v2.files.WriteMode;
 import org.springframework.stereotype.Service;
+import org.teamchallenge.bookshop.exception.DropBoxException;
+import org.teamchallenge.bookshop.exception.DropboxFolderCreationException;
+import org.teamchallenge.bookshop.exception.ImageUploadException;
 import org.teamchallenge.bookshop.service.DropboxService;
 import org.teamchallenge.bookshop.util.DropboxUtil;
 import org.teamchallenge.bookshop.util.ImageUtil;
@@ -26,12 +29,12 @@ public class DropboxServiceImpl implements DropboxService {
         } catch (CreateFolderErrorException e) {
             throw new RuntimeException(e);
         } catch (DbxException e) {
-            throw new RuntimeException(e);
+            throw new DropboxFolderCreationException();
         }
     }
 
     @Override
-    public String uploadImage(String path, BufferedImage bufferedImage) {
+    public String uploadImage(String path, BufferedImage bufferedImage)  {
         try {
             DbxClientV2 client = DropboxUtil.getClient();
             try (InputStream in = new ByteArrayInputStream(ImageUtil.bufferedImageToBytes(bufferedImage))) {
@@ -42,13 +45,12 @@ public class DropboxServiceImpl implements DropboxService {
                         .createSharedLinkWithSettings(metadata.getPathLower())
                         .getUrl()
                         .replace("www.dropbox.com", "dl.dropboxusercontent.com");
+            } catch (IOException e) {
+                throw new ImageUploadException();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (UploadErrorException e) {
-            throw new RuntimeException(e);
         } catch (DbxException e) {
-            throw new RuntimeException(e);
+            throw new DropBoxException();
         }
     }
+
 }

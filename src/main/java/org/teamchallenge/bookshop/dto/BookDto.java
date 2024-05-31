@@ -1,6 +1,8 @@
 package org.teamchallenge.bookshop.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.teamchallenge.bookshop.enums.Available;
 import org.teamchallenge.bookshop.enums.Category;
@@ -20,7 +22,10 @@ public class BookDto {
     private String full_description;
     private String short_description;
     private BigDecimal price;
+    @JsonIgnore
     private Category category;
+    @JsonProperty("categoryName")
+    private String categoryName;
     private Boolean isThisNotSlider;
     private Available available;
     private String titleImage;

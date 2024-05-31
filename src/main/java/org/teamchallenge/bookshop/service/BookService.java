@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.dto.CatalogDto;
+import org.teamchallenge.bookshop.enums.Category;
 
 import java.util.List;
 

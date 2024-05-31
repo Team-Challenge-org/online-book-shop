@@ -26,9 +26,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<BookDto> getFavouriteBooks() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return userRepository.findFavouritesById(userRepository.findIdByEmail(email).get())
+      User user = getAuthenticatedUser();
+        return userRepository.findFavouritesById(userRepository.findIdByEmail(user.getEmail()).get())
                 .stream()
                 .map(bookMapper::entityToDTO)
                 .toList();

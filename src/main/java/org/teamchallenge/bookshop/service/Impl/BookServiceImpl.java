@@ -9,7 +9,8 @@ import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.dto.CatalogDto;
-import org.teamchallenge.bookshop.exception.BookNotFoundException;
+import org.teamchallenge.bookshop.enums.Category;
+import org.teamchallenge.bookshop.exception.*;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,25 +36,38 @@ public class BookServiceImpl implements BookService {
     public void addBook(BookDto bookDto) {
         Book book = bookMapper.dtoToEntity(bookDto);
         String folderName = "/" + UUID.randomUUID();
-        dropboxService.createFolder(folderName);
-        book.setTitleImage(dropboxService.uploadImage(
-                folderName + "/title.png",
-                ImageUtil.base64ToBufferedImage(book.getTitleImage()))
-        );
+        try {
+            dropboxService.createFolder(folderName);
+        } catch (DropboxFolderCreationException e) {
+            throw new DropboxFolderCreationException();
+        }
+
+        try {
+            book.setTitleImage(dropboxService.uploadImage(
+                    folderName + "/title.png",
+                    ImageUtil.base64ToBufferedImage(bookDto.getTitleImage()))
+            );
+        } catch (ImageUploadException e) {
+            throw new ImageUploadException();
+        }
+
         int counter = 1;
         List<String> imageList = new ArrayList<>();
-        if (!book.getImages().isEmpty()) {
-            for (String s : book.getImages()) {
-                imageList.add(dropboxService.uploadImage(
-                        folderName + "/" + counter++ + ".png",
-                        ImageUtil.base64ToBufferedImage(s))
-                );
+        if (bookDto.getImages() != null && !bookDto.getImages().isEmpty()) {
+            for (String s : bookDto.getImages()) {
+                try {
+                    imageList.add(dropboxService.uploadImage(
+                            folderName + "/" + counter++ + ".png",
+                            ImageUtil.base64ToBufferedImage(s))
+                    );
+                } catch (Exception e) {
+                    throw new ImageUploadException("" + counter);
+                }
             }
+            book.setImages(imageList);
+            bookRepository.save(book);
         }
-        book.setImages(imageList);
-        bookRepository.save(book);
     }
-
     @Override
     public BookDto getBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
@@ -61,11 +76,11 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookInCatalogDto> getBooksForSlider() {
-        return bookRepository.findAll()
-                .stream()
-                .filter(Book::getIsThisNotSlider)
-                .map(bookMapper::entityToBookCatalogDTO)
-                .toList();
+            return bookRepository.findAll()
+                    .stream()
+                    .filter(Book::getIsThisNotSlider)
+                    .map(bookMapper::entityToBookCatalogDTO)
+                    .toList();
     }
 
     @Override
@@ -105,7 +120,7 @@ public class BookServiceImpl implements BookService {
     }
     @Override
     public BookInCatalogDto getBookByTitle(String title) {
-        Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
+        Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookTitleNotFoundException::new);
         return bookMapper.entityToBookCatalogDTO(book);
     }
 
@@ -116,16 +131,17 @@ public class BookServiceImpl implements BookService {
                                    String author,
                                    Float priceMin,
                                    Float priceMax) {
+        Category categoryEnum = fromName(category);
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
         Root<Book> root = query.from(Book.class);
         List<Order> orders = new ArrayList<>();
         List<Predicate> predicates = new ArrayList<>();
         if (category != null) {
-            predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            predicates.add(criteriaBuilder.equal(root.get("category"), categoryEnum));
         }
         if (author != null) {
-            predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            predicates.add(criteriaBuilder.equal(root.get("authors"), author));
         }
         if (priceMin != null) {
             predicates.add(criteriaBuilder.ge(root.get("price"), priceMin));
@@ -155,5 +171,13 @@ public class BookServiceImpl implements BookService {
                     .stream()
                     .map(bookMapper::entityToDTO)
                     .toList();
+    }
+    public  Category fromName(String name) {
+        for (Category category : Category.values()) {
+            if (category.getName().equalsIgnoreCase(name)) {
+                return category;
+            }
+        }
+        throw new WrongEnumConstantException(name);
     }
 };
