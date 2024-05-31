@@ -3,6 +3,7 @@ package org.teamchallenge.bookshop.service;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
+import org.teamchallenge.bookshop.dto.CatalogDto;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public interface BookService {
     BookDto getBookById(Long id);
 
     List<BookInCatalogDto> getBooksForSlider();
+    List<CatalogDto> getAllCategory();
 
     BookDto updateBook(BookDto bookDto);
 

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
+import org.teamchallenge.bookshop.dto.CatalogDto;
 import org.teamchallenge.bookshop.service.BookService;
 
 import java.util.List;
@@ -36,6 +37,10 @@ public class BookController {
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         BookDto bookDto = bookService.getBookById(id);
         return ResponseEntity.ok(bookDto);
+    }
+    @GetMapping("/category/all")
+    public ResponseEntity<List<CatalogDto>> getAllCategory() {
+        return ResponseEntity.ok(bookService.getAllCategory());
     }
 
     @Operation(summary = "Get all books")

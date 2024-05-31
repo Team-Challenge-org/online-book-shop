@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
+import org.teamchallenge.bookshop.dto.CatalogDto;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
@@ -63,7 +64,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll()
                 .stream()
                 .filter(Book::getIsThisNotSlider)
-                .map(bookMapper::entityToCatalogDTO)
+                .map(bookMapper::entityToBookCatalogDTO)
                 .toList();
     }
 
@@ -95,11 +96,17 @@ public class BookServiceImpl implements BookService {
                 .map(bookMapper::entityToDTO)
                 .collect(Collectors.toList());
     }
-
+    @Override
+    public List<CatalogDto> getAllCategory() {
+        return bookRepository.findAll()
+                .stream()
+                .map(bookMapper::entityToCatalogDto)
+                .collect(Collectors.toList());
+    }
     @Override
     public BookInCatalogDto getBookByTitle(String title) {
         Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookNotFoundException::new);
-        return bookMapper.entityToCatalogDTO(book);
+        return bookMapper.entityToBookCatalogDTO(book);
     }
 
     @Override
