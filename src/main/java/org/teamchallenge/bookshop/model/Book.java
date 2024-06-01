@@ -43,5 +43,6 @@ public class Book {
     @Fetch(FetchMode.JOIN)
     @ElementCollection
     private List<String> images;
+    private int quantity;
 
 }

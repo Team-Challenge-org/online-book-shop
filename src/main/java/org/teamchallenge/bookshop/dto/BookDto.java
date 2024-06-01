@@ -32,4 +32,5 @@ public class BookDto {
     private String authors;
     private LocalDate timeAdded;
     private List<String> images;
+    private int quantity;
 }
