@@ -2,8 +2,12 @@ package org.teamchallenge.bookshop.service.Impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
@@ -21,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -104,11 +107,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> getAllBooks() {
-        return bookRepository.findAllBooks()
-                .stream()
-                .map(bookMapper::entityToDTO)
-                .collect(Collectors.toList());
+    public Page<BookDto> getAllBooks(Pageable pageable) {
+        return bookRepository.findAllBooks(pageable).map(bookMapper::entityToDTO);
     }
     @Override
     public List<CategoryDto> getAllCategory() {
@@ -123,7 +123,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> getSorted(String category,
+    public Page<BookDto> getSorted(Pageable pageable,
+                                   String category,
                                    String timeAdded,
                                    String price,
                                    String author,
@@ -132,23 +133,35 @@ public class BookServiceImpl implements BookService {
         Category categoryEnum = fromName(category);
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+
         Root<Book> root = query.from(Book.class);
+        Root<Book> countRoot = countQuery.from(Book.class);
         root.fetch("images");
+
         List<Order> orders = new ArrayList<>();
         List<Predicate> predicates = new ArrayList<>();
+
         if (category != null) {
             predicates.add(criteriaBuilder.equal(root.get("category"), categoryEnum));
+            countQuery.where(criteriaBuilder.equal(countRoot.get("category"), categoryEnum));
         }
         if (author != null) {
             predicates.add(criteriaBuilder.equal(root.get("authors"), author));
+            countQuery.where(criteriaBuilder.equal(countRoot.get("authors"), author));
         }
         if (priceMin != null) {
             predicates.add(criteriaBuilder.ge(root.get("price"), priceMin));
+            countQuery.where(criteriaBuilder.ge(countRoot.get("price"), priceMin));
         }
         if (priceMax != null) {
             predicates.add(criteriaBuilder.le(root.get("price"), priceMax));
+            countQuery.where(criteriaBuilder.le(countRoot.get("price"), priceMax));
         }
+
         query.where(predicates.toArray(new Predicate[0]));
+        countQuery.select(criteriaBuilder.count(countRoot));
+
         if (timeAdded != null) {
             if (timeAdded.equalsIgnoreCase("asc")) {
                 orders.add(criteriaBuilder.asc(root.get("timeAdded")));
@@ -156,8 +169,9 @@ public class BookServiceImpl implements BookService {
                 orders.add(criteriaBuilder.desc(root.get("timeAdded")));
             }
         }
+
         if (price != null) {
-           if (price.equalsIgnoreCase("asc")) {
+            if (price.equalsIgnoreCase("asc")) {
                 orders.add(criteriaBuilder.asc(root.get("price")));
             } else {
                 orders.add(criteriaBuilder.desc(root.get("price")));
@@ -165,11 +179,25 @@ public class BookServiceImpl implements BookService {
         }
 
         query.orderBy(orders);
-        return entityManager.createQuery(query)
-                    .getResultList()
-                    .stream()
-                    .map(bookMapper::entityToDTO)
-                    .toList();
+
+        // Apply pagination
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int startIndex = pageNumber * pageSize;
+
+        TypedQuery<Book> typedQuery = entityManager.createQuery(query)
+                .setFirstResult(startIndex)
+                .setMaxResults(pageSize);
+
+        TypedQuery<Long> countTypedQuery = entityManager.createQuery(countQuery);
+        long totalCount = countTypedQuery.getSingleResult();
+
+        List<Book> bookList = typedQuery.getResultList();
+        List<BookDto> bookDtoList = bookList.stream()
+                .map(bookMapper::entityToDTO)
+                .toList();
+
+        return new PageImpl<>(bookDtoList, pageable, totalCount);
     }
     private Category fromName(String name) {
         for (Category category : Category.values()) {

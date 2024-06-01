@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +48,8 @@ public class BookController {
 
     @Operation(summary = "Get all books")
     @GetMapping("/all")
-    public ResponseEntity<List<BookDto>> getAllBooks() {
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public ResponseEntity<Page<BookDto>> getAllBooks(@PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(bookService.getAllBooks(pageable));
     }
 
     @Operation(summary = "Find book by title", description = "Get an existing book by title")
@@ -58,7 +61,8 @@ public class BookController {
 
     @Operation(summary = "Filter books")
     @GetMapping("/filter")
-    public ResponseEntity<List<BookDto>> getFilteredBooks(
+    public ResponseEntity<Page<BookDto>> getFilteredBooks(
+         @PageableDefault Pageable pageable,
          @Parameter(description = "Category name")
          @RequestParam(required = false) String  category ,
          @Parameter(description = "Sort by creating time (ASC/DESC)")
@@ -72,7 +76,7 @@ public class BookController {
          @Parameter(description = "Maximum of price value")
          @RequestParam(required = false) Float price_max
     ) {
-        List<BookDto> bookDtos = bookService.getSorted(category, time_added, price, author, price_min, price_max);
+        Page<BookDto> bookDtos = bookService.getSorted(pageable, category, time_added, price, author, price_min, price_max);
         return ResponseEntity.ok(bookDtos);
     }
 
