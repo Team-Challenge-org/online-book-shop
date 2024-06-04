@@ -65,9 +65,9 @@ public class BookServiceImpl implements BookService {
                     throw new ImageUploadException("" + counter);
                 }
             }
-            book.setImages(imageList);
-            bookRepository.save(book);
         }
+        book.setImages(imageList);
+        bookRepository.save(book);
     }
     @Override
     public BookDto getBookById(Long id) {

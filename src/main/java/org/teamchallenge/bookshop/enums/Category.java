@@ -26,5 +26,4 @@ public enum Category {
         this.id = id;
         this.name = name;
     }
-
 }

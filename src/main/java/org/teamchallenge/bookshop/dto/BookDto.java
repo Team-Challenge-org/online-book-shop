@@ -22,11 +22,8 @@ public class BookDto {
     private String full_description;
     private String short_description;
     private BigDecimal price;
-    @JsonIgnore
-    private Category category;
-    @JsonProperty("category")
-    private String categoryName;
-    private Boolean isThisNotSlider;
+    private String category;
+    private Boolean isThisSlider;
     private Available available;
     private String titleImage;
     private String authors;
