@@ -1,5 +1,7 @@
 package org.teamchallenge.bookshop.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
@@ -22,9 +24,15 @@ public interface BookService {
 
     void deleteBook(Long id);
 
-    List<BookDto> getAllBooks();
+    Page<BookDto> getAllBooks(Pageable pageable);
 
     BookInCatalogDto getBookByTitle(String title);
 
-    List<BookDto> getSorted(String category, String timeAdded, String price, String author, Float priceMin, Float priceMax);
+    Page<BookDto> getSorted(Pageable pageable,
+                            String category,
+                            String timeAdded,
+                            String price,
+                            String author,
+                            Float priceMin,
+                            Float priceMax);
 }
