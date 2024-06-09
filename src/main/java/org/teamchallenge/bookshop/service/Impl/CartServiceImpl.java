@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.CartMapper;
 import org.teamchallenge.bookshop.dto.CartDto;
 import org.teamchallenge.bookshop.exception.BookNotFoundException;
-import org.teamchallenge.bookshop.exception.NotFoundException;
-import org.teamchallenge.bookshop.exception.UserNotFoundException;
+import org.teamchallenge.bookshop.exception.CartIdNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.model.Cart;
 import org.teamchallenge.bookshop.model.User;
@@ -27,20 +26,20 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
     @Override
     public CartDto getCartById(Long id) {
-        Cart cart = cartRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        Cart cart = cartRepository.findById(id).orElseThrow(CartIdNotFoundException::new);
         return cartMapper.entityToDTO(cart);
     }
 
     @Override
     public Cart updateCart(Cart cart) {
-        cartRepository.findById(cart.getId()).orElseThrow(UserNotFoundException::new);
+        cartRepository.findById(cart.getId()).orElseThrow(CartIdNotFoundException::new);
         return cartRepository.save(cart);
     }
 
     @Override
     public CartDto clearCart() {
         User user = userService.getAuthenticatedUser();
-        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(NotFoundException::new);
+        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(CartIdNotFoundException::new);
         cart.getItems().clear();
         cart.setTotal(BigDecimal.ZERO);
         user.setCart(cart);
@@ -50,7 +49,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDto addBookToCart(Long bookId, int amount) {
         User user = userService.getAuthenticatedUser();
-        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(UserNotFoundException::new);
+        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(CartIdNotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         Map<Book, Integer> items = cart.getItems();
         items.compute(book, (key, value) -> (value == null) ? amount : value + amount);
@@ -64,7 +63,7 @@ public class CartServiceImpl implements CartService {
     @Override
    public CartDto removeBookFromCart( Long bookId, int amount) {
         User user =userService.getAuthenticatedUser();
-        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(NotFoundException::new);
+        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(CartIdNotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         Map<Book, Integer> items = cart.getItems();
         if (items.containsKey(book)) {
@@ -82,7 +81,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public BigDecimal calculateTotal(Long cartId) {
-        Cart cart = cartRepository.findById(cartId).orElseThrow(UserNotFoundException::new);
+        Cart cart = cartRepository.findById(cartId).orElseThrow(CartIdNotFoundException::new);
         return cart.getItems()
                 .entrySet()
                 .stream()

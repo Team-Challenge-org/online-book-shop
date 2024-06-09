@@ -1,7 +1,39 @@
 package org.teamchallenge.bookshop.enums;
 
+import lombok.Getter;
+import org.teamchallenge.bookshop.exception.WrongEnumConstantException;
+
+@Getter
 public enum Category {
-    ARCHITECTURE,BUSINESS_MARKETING,DESIGN,
-    CULINARY,CINEMATOGRAPHY,ART,IT_PROGRAMMING,FASHION_AND_BEAUTY,
-    PHILOSOPHY,PSYCHOLOGY,COMICS,LIFESTYLE,UKRAINIAN_AUTHORS
+    ARCHITECTURE(1, "Архітектура"),
+    BUSINESS_MARKETING(2, "Бізнес та маркетинг"),
+    DESIGN(3, "Дизайн"),
+    CULINARY(4, "Кулінарія"),
+    CINEMATOGRAPHY(5, "Кінематографія"),
+    ART(6, "Мистецтво"),
+    IT_PROGRAMMING(7, "ІТ та програмування"),
+    FASHION_AND_BEAUTY(8, "Мода та краса"),
+    PHILOSOPHY(9, "Філософія"),
+    PSYCHOLOGY(10, "Психологія"),
+    COMICS(11, "Комікси"),
+    LIFESTYLE(12, "Стиль життя"),
+    UKRAINIAN_AUTHORS(13, "Українські автори");
+
+    private final int id;
+    private final String name;
+
+    Category(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
+
+    public static Category getFromId(Integer id){
+        for (Category c: Category.values()) {
+            if (c.getId() == id) {
+                return c;
+            }
+        }
+        throw new WrongEnumConstantException(String.valueOf(id));
+    }
+
+}

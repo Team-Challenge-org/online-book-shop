@@ -1,5 +1,7 @@
 package org.teamchallenge.bookshop.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.teamchallenge.bookshop.enums.Available;
 import org.teamchallenge.bookshop.enums.Category;
 
@@ -9,8 +11,8 @@ public record BookInCatalogDto(
         long id,
         String title,
         BigDecimal price,
-        Category category,
-        Boolean isThisNotSlider,
+        String category,
+        Boolean isThisSlider,
         Available available,
         String titleImage,
         String authors

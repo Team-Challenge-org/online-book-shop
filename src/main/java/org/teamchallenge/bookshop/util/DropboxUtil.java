@@ -10,10 +10,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.teamchallenge.bookshop.exception.AccessTokenRefreshException;
+import org.teamchallenge.bookshop.exception.MissingAccessTokenException;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.teamchallenge.bookshop.constants.ValidationConstants.DROPBOX_INVALID_AUTHORIZATION_VALUE;
 
 public class DropboxUtil {
     private static String ACCESS_TOKEN = "";
@@ -23,20 +27,36 @@ public class DropboxUtil {
     private static final String TOKEN_ENDPOINT = "https://api.dropbox.com/oauth2/token";
 
     public static DbxClientV2 getClient() throws DbxException {
+        ensureAccessToken();
         DbxRequestConfig config = DbxRequestConfig.newBuilder("tcl").build();
         DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
-        try {
-            client.users().getCurrentAccount();
-        } catch (DbxException e) {
-            if (e.getMessage().contains("Invalid authorization value")) {
-                ACCESS_TOKEN = refreshAccessToken();
-                client = new DbxClientV2(config, ACCESS_TOKEN);
-            }
-        }
+        validateClient(client, config);
         return client;
     }
 
-    private static String refreshAccessToken(){
+    private static void ensureAccessToken() throws MissingAccessTokenException {
+        if (ACCESS_TOKEN == null || ACCESS_TOKEN.isEmpty()) {
+            ACCESS_TOKEN = refreshAccessToken();
+        }
+        if (ACCESS_TOKEN == null || ACCESS_TOKEN.isEmpty()) {
+            throw new MissingAccessTokenException();
+        }
+    }
+    private static void validateClient(DbxClientV2 client, DbxRequestConfig config)  {
+        try {
+            client.users().getCurrentAccount();
+        } catch (DbxException e) {
+            if (e.getMessage().contains(DROPBOX_INVALID_AUTHORIZATION_VALUE)) {
+                ACCESS_TOKEN = refreshAccessToken();
+                client = new DbxClientV2(config, ACCESS_TOKEN);
+            } else {
+                throw new MissingAccessTokenException();
+            }
+        }
+    }
+
+
+    private static String refreshAccessToken() throws AccessTokenRefreshException  {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(TOKEN_ENDPOINT);
             post.setHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -50,7 +70,7 @@ public class DropboxUtil {
                 return (String) map.get("access_token");
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AccessTokenRefreshException();
         }
     }
 }
