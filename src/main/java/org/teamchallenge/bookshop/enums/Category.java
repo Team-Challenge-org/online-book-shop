@@ -1,7 +1,7 @@
 package org.teamchallenge.bookshop.enums;
 
-
 import lombok.Getter;
+import org.teamchallenge.bookshop.exception.WrongEnumConstantException;
 
 @Getter
 public enum Category {
@@ -26,4 +26,14 @@ public enum Category {
         this.id = id;
         this.name = name;
     }
+
+    public static Category getFromId(Integer id){
+        for (Category c: Category.values()) {
+            if (c.getId() == id) {
+                return c;
+            }
+        }
+        throw new WrongEnumConstantException(String.valueOf(id));
+    }
+
 }

@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
-import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.dto.CategoryDto;
+import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.exception.*;
 import org.teamchallenge.bookshop.model.Book;
@@ -107,61 +107,51 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Page<BookDto> getAllBooks(Pageable pageable) {
-        return bookRepository.findAllBooks(pageable).map(bookMapper::entityToDTO);
-    }
-    @Override
     public List<CategoryDto> getAllCategory() {
         return Arrays.stream(Category.values())
                 .map(category -> new CategoryDto(category.getId(), category.getName()))
                 .toList();
     }
+
     @Override
-    public BookInCatalogDto getBookByTitle(String title) {
-        Book book = bookRepository.findByTitleIgnoreCase(title).orElseThrow(BookTitleNotFoundException::new);
-        return bookMapper.entityToBookCatalogDTO(book);
+    public Page<BookDto> getAllBooks(Pageable pageable) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
+        Root<Book> root = query.from(Book.class);
+        root.fetch("images", JoinType.LEFT);
+        List<Predicate> predicates = getPredicatesForBooks(criteriaBuilder, root);
+        query.where(predicates.toArray(new Predicate[0]));
+        TypedQuery<Book> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+        List<Book> bookList = typedQuery.getResultList();
+        List<BookDto> bookDtoList = bookList.stream()
+                .map(bookMapper::entityToDTO)
+                .toList();
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        Root<Book> countRoot = countQuery.from(Book.class);
+        List<Predicate> newPredicates = getPredicatesForBooks(criteriaBuilder, countRoot);
+        countQuery.select(criteriaBuilder.count(countRoot)).where(newPredicates.toArray(new Predicate[0]));
+        long totalCount = entityManager.createQuery(countQuery).getSingleResult();
+        return new PageImpl<>(bookDtoList, pageable, totalCount);
     }
 
     @Override
     public Page<BookDto> getSorted(Pageable pageable,
-                                   String category,
+                                   Integer categoryId,
                                    String timeAdded,
                                    String price,
                                    String author,
                                    Float priceMin,
                                    Float priceMax) {
-        Category categoryEnum = fromName(category);
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
-        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
-
         Root<Book> root = query.from(Book.class);
-        Root<Book> countRoot = countQuery.from(Book.class);
-        root.fetch("images");
+        root.fetch("images", JoinType.LEFT);
+        List<Predicate> predicates = getPredicatesForFilter(criteriaBuilder, categoryId, author, priceMin, priceMax, root);
+        query.where(predicates.toArray(new Predicate[0]));
 
         List<Order> orders = new ArrayList<>();
-        List<Predicate> predicates = new ArrayList<>();
-
-        if (category != null) {
-            predicates.add(criteriaBuilder.equal(root.get("category"), categoryEnum));
-            countQuery.where(criteriaBuilder.equal(countRoot.get("category"), categoryEnum));
-        }
-        if (author != null) {
-            predicates.add(criteriaBuilder.equal(root.get("authors"), author));
-            countQuery.where(criteriaBuilder.equal(countRoot.get("authors"), author));
-        }
-        if (priceMin != null) {
-            predicates.add(criteriaBuilder.ge(root.get("price"), priceMin));
-            countQuery.where(criteriaBuilder.ge(countRoot.get("price"), priceMin));
-        }
-        if (priceMax != null) {
-            predicates.add(criteriaBuilder.le(root.get("price"), priceMax));
-            countQuery.where(criteriaBuilder.le(countRoot.get("price"), priceMax));
-        }
-
-        query.where(predicates.toArray(new Predicate[0]));
-        countQuery.select(criteriaBuilder.count(countRoot));
-
         if (timeAdded != null) {
             if (timeAdded.equalsIgnoreCase("asc")) {
                 orders.add(criteriaBuilder.asc(root.get("timeAdded")));
@@ -169,7 +159,6 @@ public class BookServiceImpl implements BookService {
                 orders.add(criteriaBuilder.desc(root.get("timeAdded")));
             }
         }
-
         if (price != null) {
             if (price.equalsIgnoreCase("asc")) {
                 orders.add(criteriaBuilder.asc(root.get("price")));
@@ -177,34 +166,53 @@ public class BookServiceImpl implements BookService {
                 orders.add(criteriaBuilder.desc(root.get("price")));
             }
         }
-
         query.orderBy(orders);
 
-        // Apply pagination
-        int pageNumber = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-        int startIndex = pageNumber * pageSize;
-
-        TypedQuery<Book> typedQuery = entityManager.createQuery(query)
-                .setFirstResult(startIndex)
-                .setMaxResults(pageSize);
-
-        TypedQuery<Long> countTypedQuery = entityManager.createQuery(countQuery);
-        long totalCount = countTypedQuery.getSingleResult();
-
+        TypedQuery<Book> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
         List<Book> bookList = typedQuery.getResultList();
         List<BookDto> bookDtoList = bookList.stream()
                 .map(bookMapper::entityToDTO)
                 .toList();
 
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        Root<Book> countRoot = countQuery.from(Book.class);
+        List<Predicate> newPredicates = getPredicatesForFilter(criteriaBuilder, categoryId, author, priceMin, priceMax, countRoot);
+        countQuery.select(criteriaBuilder.count(countRoot)).where(newPredicates.toArray(new Predicate[0]));
+        long totalCount = entityManager.createQuery(countQuery).getSingleResult();
         return new PageImpl<>(bookDtoList, pageable, totalCount);
     }
-    private Category fromName(String name) {
-        for (Category category : Category.values()) {
-            if (category.getName().equalsIgnoreCase(name)) {
-                return category;
-            }
+
+
+    private List<Predicate> getPredicatesForBooks(CriteriaBuilder criteriaBuilder, Root<Book> root) {
+        return List.of(criteriaBuilder.equal(root.get("isThisSlider"), false));
+    }
+
+    private static List<Predicate> getPredicatesForFilter(CriteriaBuilder criteriaBuilder,
+                                                          Integer categoryId,
+                                                          String author,
+                                                          Float priceMin,
+                                                          Float priceMax,
+                                                          Root<Book> root) {
+        List<Predicate> predicates = new ArrayList<>();
+        if (categoryId != null) {
+            Category categoryEnum = Category.getFromId(categoryId);
+            Predicate categoryPredicate = criteriaBuilder.equal(root.get("category"), categoryEnum);
+            predicates.add(categoryPredicate);
         }
-        throw new WrongEnumConstantException(name);
+        if (author != null) {
+            Predicate authorPredicate = criteriaBuilder.equal(root.get("authors"), author);
+            predicates.add(authorPredicate);
+        }
+        if (priceMin != null) {
+            Predicate priceMinPredicate = criteriaBuilder.ge(root.get("price"), priceMin);
+            predicates.add(priceMinPredicate);
+        }
+        if (priceMax != null) {
+            Predicate priceMaxPredicate = criteriaBuilder.le(root.get("price"), priceMax);
+            predicates.add(priceMaxPredicate);
+        }
+        return predicates;
     }
 };
