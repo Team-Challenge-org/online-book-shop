@@ -1,14 +1,23 @@
 package org.teamchallenge.bookshop.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
-public record BookInCatalogDto(
-        long id,
-        String title,
-        BigDecimal price,
-        String category,
-        Boolean isThisSlider,
-        String titleImage,
-        String authors,
-        int totalQuantity
-) {}
+
+@Getter
+@Setter
+@RequiredArgsConstructor
+public class BookInCatalogDto {
+    private long id;
+    private String title;
+    private BigDecimal price;
+    private String category;
+    private Boolean isThisSlider;
+    private String titleImage;
+    private String authors;
+    private final int quantity = 1;
+}

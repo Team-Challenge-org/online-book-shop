@@ -14,7 +14,7 @@ public interface BookMapper {
     @Mapping(target = "totalQuantity", source = "quantity")
     BookDto entityToDTO(Book book);
     @Mapping(target = "category", source = "category", qualifiedByName = "categoryToString")
-    @Mapping(target = "totalQuantity", source = "quantity")
+    @Mapping(target = "quantity", ignore = true)
     BookInCatalogDto entityToBookCatalogDTO(Book book);
     @Mapping(target = "quantity", source = "totalQuantity")
     Book dtoToEntity(BookDto bookDto);
