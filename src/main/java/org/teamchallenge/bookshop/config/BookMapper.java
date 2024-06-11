@@ -11,9 +11,11 @@ import org.teamchallenge.bookshop.model.Book;
 @Mapper(config = MapperConfig.class)
 public interface BookMapper {
     @Mapping(target = "category", source = "category", qualifiedByName = "categoryToString")
+    @Mapping(target = "totalQuantity", source = "quantity")
     BookDto entityToDTO(Book book);
     @Mapping(target = "category", source = "category", qualifiedByName = "categoryToString")
     BookInCatalogDto entityToBookCatalogDTO(Book book);
+    @Mapping(target = "quantity", source = "totalQuantity")
     Book dtoToEntity(BookDto bookDto);
 
     @Named("categoryToString")
