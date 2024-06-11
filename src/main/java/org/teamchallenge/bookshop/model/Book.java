@@ -30,7 +30,6 @@ public class Book {
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private Category category;
-    @Enumerated(EnumType.STRING)
     private Boolean isThisSlider;
     @CreationTimestamp
     private LocalDate timeAdded;
