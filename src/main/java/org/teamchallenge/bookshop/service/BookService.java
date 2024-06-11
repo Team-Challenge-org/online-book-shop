@@ -26,7 +26,7 @@ public interface BookService {
 
     Page<BookDto> getAllBooks(Pageable pageable);
 
-    BookInCatalogDto getBookByTitle(String title);
+    List<BookInCatalogDto> getBookByTitle(String title);
 
     Page<BookDto> getSorted(Pageable pageable,
                             String category,
