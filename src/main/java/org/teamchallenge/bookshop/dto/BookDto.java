@@ -1,11 +1,7 @@
 package org.teamchallenge.bookshop.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.teamchallenge.bookshop.enums.Available;
-import org.teamchallenge.bookshop.enums.Category;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,7 +20,6 @@ public class BookDto {
     private BigDecimal price;
     private String category;
     private Boolean isThisSlider;
-    private Available available;
     private String titleImage;
     private String authors;
     private LocalDate timeAdded;

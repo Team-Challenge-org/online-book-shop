@@ -2,11 +2,9 @@ package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.teamchallenge.bookshop.enums.Available;
 import org.teamchallenge.bookshop.enums.Category;
 
 import java.math.BigDecimal;
@@ -33,8 +31,6 @@ public class Book {
     @Enumerated(EnumType.STRING)
     private Category category;
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'IN_STOCK'")
-    private Available available;
     private Boolean isThisSlider;
     @CreationTimestamp
     private LocalDate timeAdded;
