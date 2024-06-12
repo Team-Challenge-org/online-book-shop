@@ -75,6 +75,9 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto getBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        List<String> images = book.getImages();
+        images.add(0, book.getTitleImage());
+        book.setImages(images);
         return bookMapper.entityToDTO(book);
     }
 

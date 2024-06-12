@@ -47,7 +47,7 @@ public class BookController {
                     responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = PageImpl.class))
+                            schema = @Schema(implementation = BookDto.class))
             ),
             @ApiResponse(
                     responseCode = "404",
