@@ -97,6 +97,12 @@ public class BookController {
         return ResponseEntity.ok(bookService.getAllBooks(pageable));
     }
 
+    @Operation(summary = "Find book by title", description = "Get an existing book by title")
+    @GetMapping("/findByTitle/{title}")
+    public ResponseEntity<List<BookInCatalogDto>> getBookByTitle(@PathVariable String title) {
+        return ResponseEntity.ok(bookService.getBookByTitle(title));
+    }
+
     @Operation(
             summary = "Get books by some filter",
             responses = {

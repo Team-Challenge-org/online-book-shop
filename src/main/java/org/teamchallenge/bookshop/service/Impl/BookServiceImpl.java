@@ -117,6 +117,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<BookInCatalogDto> getBookByTitle(String title) {
+        return bookRepository.findByCombinedSimilarity(title)
+                .stream()
+                .map(bookMapper::entityToBookCatalogDTO)
+                .toList();
+    }
+
     public Page<BookDto> getAllBooks(Pageable pageable) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> query = criteriaBuilder.createQuery(Book.class);
