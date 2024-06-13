@@ -1,23 +1,20 @@
 package org.teamchallenge.bookshop.service;
 
-
+import jakarta.transaction.Transactional;
 import org.teamchallenge.bookshop.dto.CartDto;
 import org.teamchallenge.bookshop.model.Cart;
-
-import java.math.BigDecimal;
+import java.util.UUID;
 
 public interface CartService {
+    Cart createCart();
 
-    CartDto getCartById(Long id);
+    CartDto getCartById(UUID id);
 
-    Cart updateCart(Cart cart);
-    CartDto clearCart();
-    CartDto addBookToCart( Long bookId, int amount);
+    CartDto addBookToCart(UUID cartId, long bookId);
 
-    CartDto removeBookFromCart(Long bookId, int amount);
+    @Transactional
+    CartDto updateQuantity(UUID id, long bookId, int quantity);
 
-    BigDecimal calculateTotal(Long cartId);
-
-
-    BigDecimal getTotalInCart();
+    @Transactional
+    CartDto deleteBookFromCart(UUID id, long bookId);
 }

@@ -8,7 +8,7 @@ import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.model.Book;
 
-@Mapper(config = MapperConfig.class)
+@Mapper(componentModel = "spring")
 public interface BookMapper {
     @Mapping(target = "category", source = "category", qualifiedByName = "categoryToString")
     @Mapping(target = "totalQuantity", source = "quantity")

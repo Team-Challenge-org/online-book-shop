@@ -1,14 +1,12 @@
 package org.teamchallenge.bookshop.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.CartDto;
 import org.teamchallenge.bookshop.service.CartService;
-
-import java.math.BigDecimal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/cart")
@@ -17,25 +15,33 @@ import java.math.BigDecimal;
 @CrossOrigin(maxAge = 3600, origins = "*")
 public class CartController {
     private final CartService cartService;
-    @Operation(summary = "get cart by id")
-    @GetMapping("/{id}")
-    public ResponseEntity<CartDto> getCartById(@PathVariable Long id) {
-            return ResponseEntity.ok(cartService.getCartById(id));
+
+    @PostMapping("/create")
+    public ResponseEntity<UUID> createCart() {
+        return ResponseEntity.ok(cartService.createCart().getId());
     }
-    @Operation(summary = "add certain amount of books to authorized user cart and calculate total")
-    @PostMapping("/book/{bookId}")
-    public ResponseEntity<CartDto> addBookToCart( @PathVariable Long bookId, @RequestParam int amount) {
-            return ResponseEntity.ok(cartService.addBookToCart(bookId, amount));
+
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<CartDto> getCartById(@PathVariable UUID id) {
+        return ResponseEntity.ok(cartService.getCartById(id));
     }
-    @Operation(summary = "total money in authorized user cart")
-    @GetMapping("/total")
-    private ResponseEntity<BigDecimal> getTotalInCart() {
-            return ResponseEntity.ok(cartService.getTotalInCart());
+
+    @PostMapping("/add")
+    public ResponseEntity<CartDto> addBookToCart(@RequestParam UUID cartId,
+                                              @RequestParam long bookId) {
+        return ResponseEntity.ok(cartService.addBookToCart(cartId, bookId));
     }
-    @Operation(summary = "clear all cart")
-    @PutMapping("/clear")
-    public ResponseEntity<Void> clearCart() {
-            cartService.clearCart();
-            return ResponseEntity.noContent().build();
+
+    @PostMapping("/update")
+    public ResponseEntity<CartDto> updateCart(@RequestParam UUID cartId,
+                                           @RequestParam long bookId,
+                                           @RequestParam int quantity) {
+        return ResponseEntity.ok(cartService.updateQuantity(cartId, bookId, quantity));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<CartDto> deleteBookFromCart(@RequestParam UUID cartId,
+                                                   @RequestParam long bookId) {
+        return ResponseEntity.ok(cartService.deleteBookFromCart(cartId, bookId));
     }
 }
