@@ -24,6 +24,5 @@ public class BookDto {
     private String authors;
     private LocalDate timeAdded;
     private List<String> images;
-    private int totalQuantity;
-    private int quantity = 1;
+    private int quantity ;
 }
