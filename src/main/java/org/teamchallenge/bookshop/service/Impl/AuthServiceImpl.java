@@ -19,6 +19,8 @@ import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
 
+import java.time.LocalDate;
+
 
 @Service
 @AllArgsConstructor
@@ -40,7 +42,10 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(Role.USER);
-        Cart cart = cartRepository.save(new Cart());
+        Cart cart = new Cart();
+        cart.setIsPermanent(true);
+        cart.setLastModified(LocalDate.now());
+        cartRepository.save(cart);
         user.setCart(cart);
         userRepository.save(user);
         return AuthenticationResponse.builder()

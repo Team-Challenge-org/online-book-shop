@@ -10,6 +10,8 @@ public interface CartService {
 
     CartDto getCartById(UUID id);
 
+    UUID getCartIdByUserEmail(String email);
+
     CartDto addBookToCart(UUID cartId, long bookId);
 
     @Transactional

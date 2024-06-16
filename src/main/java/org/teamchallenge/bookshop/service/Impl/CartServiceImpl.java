@@ -8,9 +8,12 @@ import org.teamchallenge.bookshop.dto.CartDto;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.model.Cart;
+import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.repository.CartRepository;
 import org.teamchallenge.bookshop.service.CartService;
+import org.teamchallenge.bookshop.service.UserService;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ import java.util.UUID;
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final BookRepository bookRepository;
+    private final UserService userService;
     private final CartMapper cartMapper;
 
     @Override
@@ -34,6 +38,12 @@ public class CartServiceImpl implements CartService {
     public CartDto getCartById(UUID id) {
         Cart cart = cartRepository.findById(id).orElseThrow(NotFoundException::new);
         return cartMapper.entityToDto(cart);
+    }
+
+    @Override
+    public UUID getCartIdByUserEmail(String email) {
+        User user = userService.findUserByEmail(email).orElseThrow(NotFoundException::new);
+        return user.getCart().getId();
     }
 
     @Override
