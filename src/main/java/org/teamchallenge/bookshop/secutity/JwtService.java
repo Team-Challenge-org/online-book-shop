@@ -1,13 +1,15 @@
 package org.teamchallenge.bookshop.secutity;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
+import org.teamchallenge.bookshop.model.User;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -18,36 +20,48 @@ public class JwtService {
     private static final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
             .orElseThrow(SecretKeyNotFoundException::new);
 
-    private static final long EXPIRATION_TIME = 1000* 60 * 60 * 24;
-    public String extractUsername(String token) {
-        return parseJWT(token).getBody().getSubject();
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
+    public static String extractUsername(String token) {
+        return Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("email", String.class);
     }
 
-    public static String generateJWT(String subject) {
+    public static String generateJWT(User user) {
         return Jwts.builder()
-                .subject(subject)
-                .issuedAt(new Date(System.currentTimeMillis()))
+                .claim("email", user.getEmail())
+                .claim("cartId", user.getCart().getId())
+                .subject(user.getEmail())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
-    public boolean isTokenValid(String jwt, UserDetails userDetails) {
-        final String username = extractUsername(jwt);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(jwt));
+
+    public static boolean isTokenValid(String jwt) {
+        try {
+            Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(jwt);
+            return true;
+        } catch (ExpiredJwtException e) {
+            //expired
+            return false;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
-    private boolean isTokenExpired(String jwt) {
-        return parseJWT(jwt).getBody().getExpiration().before(new Date());
-    }
-
-    private Jws<Claims> parseJWT(String jwt) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(jwt);
-    }
     private static SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public static String extractTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }
