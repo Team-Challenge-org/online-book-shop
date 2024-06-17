@@ -1,6 +1,7 @@
 package org.teamchallenge.bookshop.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class CartController {
             security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/findById")
     public ResponseEntity<CartDto> getCartById(
+            @Parameter(description = "Id of cart")
             @CookieValue(required = false, name = "cartId") UUID cartId,
             HttpServletRequest request) {
         return extractCartId(request, cartId)
@@ -38,10 +40,12 @@ public class CartController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build());
     }
 
+    @Operation(summary = "Add book in cart",
+            security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/add")
     public ResponseEntity<CartDto> addBookToCart(
+            @Parameter(description = "Id of cart")
             @CookieValue(required = false, name = "cartId") UUID cartId,
-            @RequestHeader(required = false, name = "Authorization") String jwt,
             @RequestParam long bookId,
             HttpServletRequest request) {
         return extractCartId(request, cartId)
@@ -49,11 +53,15 @@ public class CartController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build());
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<CartDto> updateCart(
+    @Operation(summary = "Update amount of book in cart",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @PutMapping("/update")
+    public ResponseEntity<CartDto> updateBookQuantityInCart(
+            @Parameter(description = "Id of cart")
             @CookieValue(required = false, name = "cartId") UUID cartId,
-            @RequestHeader(required = false, name = "Authorization") String jwt,
+            @Parameter(description = "Id of book")
             @RequestParam long bookId,
+            @Parameter(description = "New quantity of book")
             @RequestParam int quantity,
             HttpServletRequest request) {
         return extractCartId(request, cartId)
@@ -61,10 +69,13 @@ public class CartController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build());
     }
 
+    @Operation(summary = "Delete book from cart",
+            security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("/delete")
     public ResponseEntity<CartDto> deleteBookFromCart(
+            @Parameter(description = "Id of cart")
             @CookieValue(required = false, name = "cartId") UUID cartId,
-            @RequestHeader(required = false, name = "Authorization") String jwt,
+            @Parameter(description = "Id of book")
             @RequestParam long bookId,
             HttpServletRequest request) {
         return extractCartId(request, cartId)
