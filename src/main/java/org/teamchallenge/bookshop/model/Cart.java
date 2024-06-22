@@ -30,9 +30,11 @@ public class Cart {
             throw new IllegalArgumentException("Invalid quantity");
         }
         items.merge(book, quantity, Integer::sum);
+        lastModified = LocalDate.now();
     }
 
     public void deleteBook(Book book) {
         items.remove(book);
+        lastModified = LocalDate.now();
     }
 }

@@ -1,12 +1,16 @@
 package org.teamchallenge.bookshop.service.Impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.enums.Role;
+import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.Cart;
@@ -18,9 +22,8 @@ import org.teamchallenge.bookshop.repository.CartRepository;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
-
 import java.time.LocalDate;
-
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -30,9 +33,11 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final CartRepository cartRepository;
 
-    @Transactional
+    @Autowired
+    EntityManager entityManager;
+
     @Override
-    public AuthenticationResponse register(RegisterRequest registerRequest) {
+    public AuthenticationResponse register(RegisterRequest registerRequest, UUID cartId) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException();
         }
@@ -42,11 +47,17 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(Role.USER);
-        Cart cart = new Cart();
-        cart.setIsPermanent(true);
-        cart.setLastModified(LocalDate.now());
-        cartRepository.save(cart);
-        user.setCart(cart);
+        Cart cart;
+        if (cartId != null) {
+            cart = cartRepository.findById(cartId).orElseThrow(NotFoundException::new);
+            user.setCart(cart);
+        } else {
+            cart = new Cart();
+            cart.setIsPermanent(true);
+            cart.setLastModified(LocalDate.now());
+            cartRepository.save(cart);
+            user.setCart(cart);
+        }
         userRepository.save(user);
         return AuthenticationResponse.builder()
                 .token(JwtService.generateJWT(user))

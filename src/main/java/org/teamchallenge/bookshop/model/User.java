@@ -33,6 +33,7 @@ public class User   {
     inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> favourites = new ArrayList<>();
     @OneToOne
+    @JoinColumn(name = "cart_id")
     private Cart cart;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "users_orders",
