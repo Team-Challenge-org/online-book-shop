@@ -1,8 +1,7 @@
 package org.teamchallenge.bookshop.service.Impl;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +13,13 @@ import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.Cart;
+import org.teamchallenge.bookshop.model.Token;
 import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
 import org.teamchallenge.bookshop.repository.CartRepository;
+import org.teamchallenge.bookshop.repository.TokenRepository;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
@@ -32,6 +33,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final CartRepository cartRepository;
+    private final TokenRepository tokenRepository;
+    private final JwtService jwtService;
 
     @Autowired
     EntityManager entityManager;
@@ -60,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
         }
         userRepository.save(user);
         return AuthenticationResponse.builder()
-                .token(JwtService.generateJWT(user))
+                .token(jwtService.generateJWT(user))
                 .build();
     }
 
@@ -74,7 +77,14 @@ public class AuthServiceImpl implements AuthService {
         );
         User user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow(UserNotFoundException::new);
         return AuthenticationResponse.builder()
-                .token(JwtService.generateJWT(user))
+                .token(jwtService.generateJWT(user))
                 .build();
+    }
+
+    @Override
+    public void logout(HttpServletRequest request) {
+        String jwt = jwtService.extractTokenFromRequest(request);
+        Token token = jwtService.blacklistToken(jwt);
+        tokenRepository.save(token);
     }
 }
