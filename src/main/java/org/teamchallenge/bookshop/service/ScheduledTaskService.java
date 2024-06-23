@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class ScheduledTaskService {
@@ -23,6 +24,16 @@ public class ScheduledTaskService {
                         "WHERE c.lastModified < :weekAgo AND c.isPermanent = false"
                 )
                 .setParameter("weekAgo", oneWeekAgo)
+                .executeUpdate();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void deleteExpiredTokens() {
+        entityManager.createQuery(
+                        "DELETE FROM Token t " +
+                                "WHERE t.expiryDate < :now"
+                )
+                .setParameter("now", LocalDateTime.now())
                 .executeUpdate();
     }
 }

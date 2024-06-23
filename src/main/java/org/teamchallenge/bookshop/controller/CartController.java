@@ -22,6 +22,7 @@ import java.util.UUID;
 @CrossOrigin(maxAge = 3600, origins = "*")
 public class CartController {
     private final CartService cartService;
+    private final JwtService jwtService;
 
     @PostMapping("/create")
     public ResponseEntity<UUID> createCart() {
@@ -84,11 +85,11 @@ public class CartController {
     }
 
     private Optional<UUID> extractCartId(HttpServletRequest request, UUID cartId) {
-        String jwt = JwtService.extractTokenFromRequest(request);
+        String jwt = jwtService.extractTokenFromRequest(request);
         if (cartId != null) {
             return Optional.of(cartId);
-        } else if (jwt != null && JwtService.isTokenValid(jwt)) {
-                return Optional.ofNullable(cartService.getCartIdByUserEmail(JwtService.extractUsername(jwt)));
+        } else if (jwt != null && jwtService.isTokenValid(jwt)) {
+                return Optional.ofNullable(cartService.getCartIdByUserEmail(jwtService.extractUsername(jwt)));
         } else {
             return Optional.empty();
         }
