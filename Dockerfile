@@ -1,6 +1,8 @@
 # Stage 1: Build the application
 FROM maven:3.8.4-openjdk-17 AS builder
 
+ENV JAVA_HOME=/usr/java/openjdk-17
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -25,9 +27,6 @@ COPY --from=builder /app/target/book-shop-0.0.1-SNAPSHOT.jar ./book-shop-0.0.1-S
 #Uncomment this if you are building with .env file
 #RUN source .env
 #COPY .env .
-
-# Set JAVA_HOME explicitly (for hosting)
-ENV JAVA_HOME /usr/java/openjdk-17
 
 # Expose the port that the Spring Boot application uses (default is 8080)
 EXPOSE 8080
