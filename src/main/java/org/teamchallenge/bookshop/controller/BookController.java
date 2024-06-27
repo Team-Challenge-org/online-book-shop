@@ -2,6 +2,7 @@ package org.teamchallenge.bookshop.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,7 +59,9 @@ public class BookController {
             )}
     )
     @GetMapping("/findById/{id}")
-    public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
+    public ResponseEntity<BookDto> getBookById(
+            @Parameter(required = true, in = ParameterIn.PATH)
+            @PathVariable Long id) {
         BookDto bookDto = bookService.getBookById(id);
         return ResponseEntity.ok(bookDto);
     }
@@ -99,7 +102,9 @@ public class BookController {
 
     @Operation(summary = "Find book by title", description = "Get an existing book by title")
     @GetMapping("/findByTitle/{title}")
-    public ResponseEntity<List<BookInCatalogDto>> getBookByTitle(@PathVariable String title) {
+    public ResponseEntity<List<BookInCatalogDto>> getBookByTitle(
+            @Parameter(required = true, in = ParameterIn.PATH)
+            @PathVariable String title) {
         return ResponseEntity.ok(bookService.getBookByTitle(title));
     }
 

@@ -14,7 +14,12 @@ COPY pom.xml .
 COPY src ./src
 
 # Build the application with Maven
-RUN mvn package -DskipTests
+# Uncomment this row to use cached dependencies
+RUN --mount=type=cache,target=/root/.m2 mvn -f pom.xml clean package -DskipTests
+
+# Comment this row if you are using cached dependencies
+#RUN mvn clean package -DskipTests
+
 
 # Stage 2: Create a minimal runtime image
 FROM openjdk:17-jdk-slim
