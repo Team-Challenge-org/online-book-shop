@@ -11,10 +11,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
-import org.teamchallenge.bookshop.dto.CategoryDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
+import org.teamchallenge.bookshop.dto.CategoryDto;
 import org.teamchallenge.bookshop.enums.Category;
-import org.teamchallenge.bookshop.exception.*;
+import org.teamchallenge.bookshop.exception.BookNotFoundException;
+import org.teamchallenge.bookshop.exception.DropboxFolderCreationException;
+import org.teamchallenge.bookshop.exception.ImageUploadException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.repository.BookRepository;
 import org.teamchallenge.bookshop.service.BookService;
@@ -40,6 +42,7 @@ public class BookServiceImpl implements BookService {
     public void addBook(BookDto bookDto) {
         Book book = bookMapper.dtoToEntity(bookDto);
         String folderName = "/" + UUID.randomUUID();
+        book.setDropboxFolderPath(folderName);
         try {
             dropboxService.createFolder(folderName);
         } catch (DropboxFolderCreationException e) {
@@ -72,6 +75,7 @@ public class BookServiceImpl implements BookService {
         book.setImages(imageList);
         bookRepository.save(book);
     }
+
     @Override
     public BookDto getBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
@@ -84,30 +88,59 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookInCatalogDto> getBooksForSlider() {
-            return bookRepository.findSliderBooks()
-                    .stream()
-                    .map(bookMapper::entityToBookCatalogDTO)
-                    .toList();
+        return bookRepository.findSliderBooks()
+                .stream()
+                .map(bookMapper::entityToBookCatalogDTO)
+                .toList();
     }
 
     @Override
-    public BookDto updateBook(BookDto bookDto) {
-        Book book = bookRepository.findById(bookDto.getId()).orElseThrow(BookNotFoundException::new);
-        Book updatedBook = Book.builder()
-                .id(bookDto.getId())
-                .title(book.getTitle())
-                .price(bookDto.getPrice())
-                .timeAdded(book.getTimeAdded())
-                .titleImage(bookDto.getTitleImage())
-                .build();
-        bookRepository.save(updatedBook);
+    public BookDto updateBook(Long id, BookDto bookDto) {
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(BookNotFoundException::new);
+
+        bookMapper.updateBookFromDto(bookDto, existingBook);
+
+        if (bookDto.getTitleImage() != null && !bookDto.getTitleImage().isEmpty()) {
+            try {
+                String newTitleImage = dropboxService.uploadImage(
+                        "/updated_" + id + "/title.png",
+                        ImageUtil.base64ToBufferedImage(bookDto.getTitleImage())
+                );
+                existingBook.setTitleImage(newTitleImage);
+            } catch (Exception e) {
+                throw new ImageUploadException("Failed to update title image");
+            }
+        }
+
+        if (bookDto.getImages() != null && !bookDto.getImages().isEmpty()) {
+            List<String> updatedImages = new ArrayList<>();
+            int counter = 1;
+            for (String image : bookDto.getImages()) {
+                try {
+                    String updatedImage = dropboxService.uploadImage(
+                            "/updated_" + id + "/" + counter++ + ".png",
+                            ImageUtil.base64ToBufferedImage(image)
+                    );
+                    updatedImages.add(updatedImage);
+                } catch (Exception e) {
+                    throw new ImageUploadException("Failed to update image " + counter);
+                }
+            }
+            existingBook.setImages(updatedImages);
+        }
+
+        Book updatedBook = bookRepository.save(existingBook);
         return bookMapper.entityToDTO(updatedBook);
     }
 
     @Override
     public void deleteBook(Long id) {
-        bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
-        bookRepository.deleteById(id);
+        Book book = bookRepository.findById(id)
+                .orElseThrow(BookNotFoundException::new);
+
+        dropboxService.deleteFolder(book.getDropboxFolderPath());
+        bookRepository.delete(book);
     }
 
     @Override

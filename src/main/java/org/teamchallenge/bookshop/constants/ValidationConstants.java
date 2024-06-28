@@ -24,4 +24,5 @@ public interface ValidationConstants {
     String WRONG_ENUM_CONSTANT = "No enum constant with name:  ";
     String ERROR_WITH_DROPBOX_COMMUNICATION = "Error while communicating with Dropbox" ;
     String ORDER_ID_NOT_FOUND = "Order id not found";
+    String DROPBOX_DELETE_FOLDER = "Failed to delete folder from Dropbox: ";
 }

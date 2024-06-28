@@ -20,7 +20,7 @@ public interface BookService {
 
     List<CategoryDto> getAllCategory();
 
-    BookDto updateBook(BookDto bookDto);
+    BookDto updateBook(Long id, BookDto bookDto);
 
     void deleteBook(Long id);
 

@@ -1,14 +1,12 @@
 package org.teamchallenge.bookshop.config;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.enums.Category;
 import org.teamchallenge.bookshop.model.Book;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface BookMapper {
     @Mapping(target = "category", source = "category", qualifiedByName = "categoryToString")
     BookDto entityToDTO(Book book);
@@ -16,6 +14,8 @@ public interface BookMapper {
     @Mapping(target = "quantity", ignore = true)
     BookInCatalogDto entityToBookCatalogDTO(Book book);
     Book dtoToEntity(BookDto bookDto);
+    @Mapping(target = "id", ignore = true)
+    void updateBookFromDto(BookDto dto, @MappingTarget Book entity);
 
     @Named("categoryToString")
     default String categoryToString(Category category) {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Include any files or directories that you don't want to be copied to your
 # container here (e.g., local build artifacts, temporary files, etc.).
 #
@@ -32,3 +33,6 @@
 **/vendor
 LICENSE
 README.md
+=======
+target
+>>>>>>> 23e83e9207938ba0ab972d8c66e34827e55f68f9

@@ -12,15 +12,12 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.teamchallenge.bookshop.exception.AccessTokenRefreshException;
 import org.teamchallenge.bookshop.exception.MissingAccessTokenException;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.teamchallenge.bookshop.constants.ValidationConstants.DROPBOX_INVALID_AUTHORIZATION_VALUE;
-
 public class DropboxUtil {
-    private static String ACCESS_TOKEN = "";
+    private static String ACCESS_TOKEN = System.getenv("DROPBOX_TOKEN");
     private static final String APP_KEY = System.getenv("APP_KEY");
     private static final String APP_SECRET = System.getenv("APP_SECRET");
     private static final String REFRESH_TOKEN = System.getenv("REFRESH_TOKEN");
@@ -30,7 +27,7 @@ public class DropboxUtil {
         ensureAccessToken();
         DbxRequestConfig config = DbxRequestConfig.newBuilder("tcl").build();
         DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
-        validateClient(client, config);
+        client = validateClient(client, config);
         return client;
     }
 
@@ -42,19 +39,19 @@ public class DropboxUtil {
             throw new MissingAccessTokenException();
         }
     }
-    private static void validateClient(DbxClientV2 client, DbxRequestConfig config)  {
+    private static DbxClientV2 validateClient(DbxClientV2 client, DbxRequestConfig config)  {
         try {
             client.users().getCurrentAccount();
+            return client;
         } catch (DbxException e) {
-            if (e.getMessage().contains(DROPBOX_INVALID_AUTHORIZATION_VALUE)) {
+            if (e.getMessage().contains("expired_access_token")) {
                 ACCESS_TOKEN = refreshAccessToken();
-                client = new DbxClientV2(config, ACCESS_TOKEN);
+                return new DbxClientV2(config, ACCESS_TOKEN);
             } else {
                 throw new MissingAccessTokenException();
             }
         }
     }
-
 
     private static String refreshAccessToken() throws AccessTokenRefreshException  {
         try (CloseableHttpClient client = HttpClients.createDefault()) {

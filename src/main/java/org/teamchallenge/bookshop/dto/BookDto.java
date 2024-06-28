@@ -1,6 +1,7 @@
 package org.teamchallenge.bookshop.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.math.BigDecimal;

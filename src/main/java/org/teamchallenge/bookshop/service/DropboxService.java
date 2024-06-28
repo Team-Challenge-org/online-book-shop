@@ -9,4 +9,6 @@ public interface DropboxService {
     void createFolder(String path);
 
     String uploadImage(String path, BufferedImage bufferedImage);
+
+    void deleteFolder(String s);
 }

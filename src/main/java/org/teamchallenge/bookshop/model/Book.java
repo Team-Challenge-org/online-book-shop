@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -39,6 +40,7 @@ public class Book {
     @ElementCollection
     private List<String> images;
     private int quantity;
+    private String dropboxFolderPath;
 
 
 }

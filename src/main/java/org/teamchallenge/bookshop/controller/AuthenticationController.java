@@ -1,6 +1,5 @@
 package org.teamchallenge.bookshop.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
-import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
 
 import java.util.UUID;

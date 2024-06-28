@@ -4,10 +4,10 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.CreateFolderErrorException;
 import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.UploadErrorException;
 import com.dropbox.core.v2.files.WriteMode;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.exception.DropBoxException;
+import org.teamchallenge.bookshop.exception.DropboxDeleteException;
 import org.teamchallenge.bookshop.exception.DropboxFolderCreationException;
 import org.teamchallenge.bookshop.exception.ImageUploadException;
 import org.teamchallenge.bookshop.service.DropboxService;
@@ -50,6 +50,14 @@ public class DropboxServiceImpl implements DropboxService {
             }
         } catch (DbxException e) {
             throw new DropBoxException();
+        }
+    }
+    public void deleteFolder(String folderPath) {
+        try {
+            DbxClientV2 client = DropboxUtil.getClient();
+            client.files().deleteV2(folderPath);
+        } catch (DbxException e) {
+            throw new DropboxDeleteException(folderPath);
         }
     }
 

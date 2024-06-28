@@ -1,46 +1,37 @@
-# syntax=docker/dockerfile:1
+# Stage 1: Build the application
+FROM maven:3.8.4-openjdk-17 AS builder
 
-FROM eclipse-temurin:17-jdk-jammy as deps
-WORKDIR /build
-COPY --chmod=0755 mvnw mvnw
-COPY .mvn/ .mvn/
-RUN --mount=type=bind,source=pom.xml,target=pom.xml \
-    --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline -DskipTests
+# Enable BuildKit
+ENV DOCKER_BUILDKIT=1
 
-FROM deps as package
-WORKDIR /build
-COPY ./src src/
-RUN --mount=type=bind,source=pom.xml,target=pom.xml \
-    --mount=type=cache,target=/root/.m2 \
-    ./mvnw package -DskipTests && \
-    mv target/$(./mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout)-$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout).jar target/app.jar
+# Set the working directory inside the container
+WORKDIR /app
 
-FROM package as extract
-WORKDIR /build
-RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/extracted
+# Copy the Maven project descriptor files for dependencies resolution
+COPY pom.xml .
 
-FROM extract as development
-WORKDIR /build
-RUN cp -r /build/target/extracted/dependencies/. ./
-RUN cp -r /build/target/extracted/spring-boot-loader/. ./
-RUN cp -r /build/target/extracted/snapshot-dependencies/. ./
-RUN cp -r /build/target/extracted/application/. ./
-CMD [ "java", "-Dspring.profiles.active=postgres", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'", "org.springframework.boot.loader.launch.JarLauncher" ]
+# Copy the entire project source
+COPY src ./src
 
-FROM eclipse-temurin:17-jre-jammy AS final
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-USER appuser
-COPY --from=extract build/target/extracted/dependencies/ ./
-COPY --from=extract build/target/extracted/spring-boot-loader/ ./
-COPY --from=extract build/target/extracted/snapshot-dependencies/ ./
-COPY --from=extract build/target/extracted/application/ ./
+# Build the application with Maven
+# Uncomment this row to use cached dependencies
+RUN --mount=type=cache,target=/root/.m2 mvn -f pom.xml clean package -DskipTests
+
+# Comment this row if you are using cached dependencies
+#RUN mvn clean package -DskipTests
+
+
+# Stage 2: Create a minimal runtime image
+FROM openjdk:17-jdk-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the compiled application JAR file from the builder stage
+COPY --from=builder /app/target/book-shop-0.0.1-SNAPSHOT.jar ./book-shop-0.0.1-SNAPSHOT.jar
+
+# Expose the port that the Spring Boot application uses (default is 8080)
 EXPOSE 8080
-ENTRYPOINT [ "java", "-Dspring.profiles.active=postgres", "org.springframework.boot.loader.launch.JarLauncher" ]
+
+# Specify the command to run on container start
+CMD ["java", "-jar", "book-shop-0.0.1-SNAPSHOT.jar"]
