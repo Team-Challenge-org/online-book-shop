@@ -9,17 +9,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.enums.Role;
-import org.teamchallenge.bookshop.exception.NotFoundException;
-import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
-import org.teamchallenge.bookshop.exception.UserNotFoundException;
+import org.teamchallenge.bookshop.enums.TokenStatus;
+import org.teamchallenge.bookshop.exception.*;
 import org.teamchallenge.bookshop.model.Cart;
-import org.teamchallenge.bookshop.model.Token;
 import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
 import org.teamchallenge.bookshop.repository.CartRepository;
-import org.teamchallenge.bookshop.repository.TokenRepository;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
@@ -33,7 +30,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final CartRepository cartRepository;
-    private final TokenRepository tokenRepository;
     private final JwtService jwtService;
 
     @Autowired
@@ -63,7 +59,8 @@ public class AuthServiceImpl implements AuthService {
         }
         userRepository.save(user);
         return AuthenticationResponse.builder()
-                .token(jwtService.generateJWT(user))
+                .accessToken(jwtService.generateAccessToken(user))
+                .refreshToken(jwtService.generateRefreshToken())
                 .build();
     }
 
@@ -77,14 +74,33 @@ public class AuthServiceImpl implements AuthService {
         );
         User user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow(UserNotFoundException::new);
         return AuthenticationResponse.builder()
-                .token(jwtService.generateJWT(user))
+                .accessToken(jwtService.generateAccessToken(user))
+                .refreshToken(jwtService.generateRefreshToken())
+                .build();
+    }
+
+    @Override
+    public AuthenticationResponse refresh(HttpServletRequest request, String refreshToken) {
+        String accessToken = jwtService.extractTokenFromRequest(request);
+        if (jwtService.checkToken(refreshToken) == TokenStatus.VALID && jwtService.checkToken(accessToken) == TokenStatus.EXPIRED) {
+            User user = userRepository
+                    .findByEmail(jwtService.extractUsername(accessToken))
+                    .orElseThrow(UserNotFoundException::new);
+            accessToken = jwtService.generateAccessToken(user);
+        } else if (jwtService.checkToken(refreshToken) == TokenStatus.BLACKLISTED) {
+            throw new TokenBlacklistedException("Seems like refresh token is blacklisted");
+        } else if (jwtService.checkToken(refreshToken) == TokenStatus.EXPIRED) {
+            throw new TokenExpiredException("Refresh token is expired. Log in again");
+        }
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     @Override
     public void logout(HttpServletRequest request) {
         String jwt = jwtService.extractTokenFromRequest(request);
-        Token token = jwtService.blacklistToken(jwt);
-        tokenRepository.save(token);
+        jwtService.blacklistToken(jwt);
     }
 }

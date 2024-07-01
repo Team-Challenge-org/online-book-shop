@@ -8,6 +8,10 @@ import java.util.UUID;
 
 public interface AuthService {
      AuthenticationResponse register (RegisterRequest registerRequest, UUID cartID);
+
      AuthenticationResponse auth (AuthRequest authRequest);
+
+     AuthenticationResponse refresh(HttpServletRequest request, String refreshToken);
+
      void logout(HttpServletRequest request);
 }

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.CartDto;
+import org.teamchallenge.bookshop.enums.TokenStatus;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.CartService;
 import java.util.Optional;
@@ -88,7 +89,7 @@ public class CartController {
         String jwt = jwtService.extractTokenFromRequest(request);
         if (cartId != null) {
             return Optional.of(cartId);
-        } else if (jwt != null && jwtService.isTokenValid(jwt)) {
+        } else if (jwt != null && jwtService.checkToken(jwt) == TokenStatus.VALID) {
                 return Optional.ofNullable(cartService.getCartIdByUserEmail(jwtService.extractUsername(jwt)));
         } else {
             return Optional.empty();

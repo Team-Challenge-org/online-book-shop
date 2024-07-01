@@ -85,4 +85,8 @@ public class ExceptionController {
     public ResponseEntity<ErrorObject> missingRefreshAccessToken(AccessTokenRefreshException e) {
         return handleException(e, MISSING_REFRESH_ACCESS_TOKEN, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(TokenAlreadyBlacklistedException.class)
+    public ResponseEntity<ErrorObject> tokenAlreadyBlacklisted(TokenAlreadyBlacklistedException e) {
+        return handleException(e, "You have logout already!", HttpStatus.BAD_REQUEST);
+    }
 }

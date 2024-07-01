@@ -1,63 +1,79 @@
 package org.teamchallenge.bookshop.secutity;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
-import org.teamchallenge.bookshop.model.Token;
+import org.teamchallenge.bookshop.enums.TokenStatus;
+import org.teamchallenge.bookshop.exception.*;
 import org.teamchallenge.bookshop.model.User;
-import org.teamchallenge.bookshop.repository.TokenRepository;
-
+import org.teamchallenge.bookshop.model.request.AuthRequest;
+import org.teamchallenge.bookshop.service.UserService;
 import javax.crypto.SecretKey;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JwtService {
+    private final StringRedisTemplate redisTemplate;
+    private final UserService userService;
+
     private static final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
             .orElseThrow(SecretKeyNotFoundException::new);
 
-    private final TokenRepository tokenRepository;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 4;
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 *60 * 24 * 14;
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
-    public String extractUsername(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("email", String.class);
+    public String extractUsername(String token) throws TokenBlacklistedException, TokenExpiredException {
+        TokenStatus tokenStatus = checkToken(token);
+        if (tokenStatus == TokenStatus.VALID) {
+            return Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("email", String.class);
+        } else if (tokenStatus == TokenStatus.BLACKLISTED){
+            throw new TokenBlacklistedException("Token is blacklisted!");
+        } else {
+            throw new TokenExpiredException("Token is blacklisted!");
+        }
     }
 
-    public String generateJWT(User user) {
+    public String generateAccessToken(User user) {
         return Jwts.builder()
                 .claim("email", user.getEmail())
-                .claim("cartId", user.getCart().getId())
                 .subject(user.getEmail())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
-    public boolean isTokenValid(String jwt) {
+    public String generateRefreshToken() {
+        return Jwts.builder()
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
+                .compact();
+    }
+
+    public TokenStatus checkToken(String token) {
         try {
-            Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(jwt);
-            return tokenRepository.findById(jwt).isEmpty();
+            Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token);
+            return redisTemplate.hasKey(token) ? TokenStatus.BLACKLISTED : TokenStatus.VALID;
         } catch (ExpiredJwtException e) {
-            //expired
-            return false;
+            return TokenStatus.EXPIRED;
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            throw new TokenInvalidException("Token is invalid");
         }
     }
 
@@ -74,11 +90,36 @@ public class JwtService {
         return null;
     }
 
-    public Token blacklistToken(String jwt) {
-        Claims payload = Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(jwt).getPayload();
-        LocalDateTime localDateTime = payload.getExpiration().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        return new Token(jwt, localDateTime);
+    public void blacklistToken(String token) {
+        Claims payload = Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
+        long time = payload.getExpiration().getTime() - payload.getIssuedAt().getTime();
+        if (redisTemplate.hasKey(token)) {
+            throw new TokenAlreadyBlacklistedException();
+        }
+        redisTemplate.opsForValue().set(token, "true", time, TimeUnit.MILLISECONDS);
+    }
+
+    @Deprecated
+    //testing purpose only
+    public ResponseEntity<String> generateExpiredAccessToken(AuthRequest authRequest) {
+        User user = userService.findUserByEmail(authRequest.getEmail()).orElseThrow(NotFoundException::new);
+        String expiredJwt = Jwts.builder()
+                .claim("email", user.getEmail())
+                .subject(user.getEmail())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
+                .compact();
+        return ResponseEntity.ok(expiredJwt);
+    }
+
+    @Deprecated
+    public ResponseEntity<String> generateExpiredRefreshToken() {
+        String expiredJwt = Jwts.builder()
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
+                .compact();
+        return ResponseEntity.ok(expiredJwt);
     }
 }
