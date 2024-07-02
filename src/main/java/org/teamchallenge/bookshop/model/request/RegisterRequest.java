@@ -17,4 +17,5 @@ public class RegisterRequest {
     private String email;
     @Pattern(regexp = PASSWORD_REGEXP, message = WRONG_PASSWORD_CREATION_MESSAGE)
     private String password;
+    private String phone_number;
 }
