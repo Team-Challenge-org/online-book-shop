@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -55,21 +58,27 @@ public class BookServiceImpl implements BookService {
             throw new ImageUploadException();
         }
 
-        int counter = 1;
-        List<String> imageList = new ArrayList<>();
-        if (bookDto.getImages() != null && !bookDto.getImages().isEmpty()) {
-            for (String s : bookDto.getImages()) {
+        AtomicInteger counter = new AtomicInteger(1);
+        List<String> images = bookDto.getImages();
+        List<String> links = new ArrayList<>();
+        if (images != null && !images.isEmpty()) {
+            List<CompletableFuture<String>> imageList = images.stream()
+                    .map(image -> CompletableFuture
+                            .supplyAsync(() -> dropboxService.uploadImage(
+                                    folderName + "/" +counter.getAndIncrement() + ".png",
+                                    ImageUtil.base64ToBufferedImage(image)
+                            ))
+                    )
+                    .toList();
+            imageList.forEach(future -> {
                 try {
-                    imageList.add(dropboxService.uploadImage(
-                            folderName + "/" + counter++ + ".png",
-                            ImageUtil.base64ToBufferedImage(s))
-                    );
-                } catch (Exception e) {
-                    throw new ImageUploadException("" + counter);
+                    links.add(future.get());
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
                 }
-            }
+            });
         }
-        book.setImages(imageList);
+        book.setImages(links);
         bookRepository.save(book);
     }
     @Override
