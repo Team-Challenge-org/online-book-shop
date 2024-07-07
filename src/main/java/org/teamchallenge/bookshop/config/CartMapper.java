@@ -1,6 +1,5 @@
 package org.teamchallenge.bookshop.config;
 
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

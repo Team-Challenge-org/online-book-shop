@@ -51,7 +51,7 @@ public class CartServiceImpl implements CartService {
     public CartDto addBookToCart(UUID cartId, long bookId) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(NotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(NotFoundException::new);
-        cart.addOrUpdateBook(book, 1);
+        addOrUpdateBook(cart, book, 1);
         cartRepository.save(cart);
         return cartMapper.entityToDto(cart);
     }
@@ -61,7 +61,7 @@ public class CartServiceImpl implements CartService {
     public CartDto updateQuantity(UUID id, long bookId, int quantity) {
         Cart cart = cartRepository.findById(id).orElseThrow(NotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(NotFoundException::new);
-        cart.addOrUpdateBook(book, quantity);
+        addOrUpdateBook(cart, book, quantity);
         cartRepository.save(cart);
         return cartMapper.entityToDto(cart);
     }
@@ -71,8 +71,21 @@ public class CartServiceImpl implements CartService {
     public CartDto deleteBookFromCart(UUID id, long bookId) {
         Cart cart = cartRepository.findById(id).orElseThrow(NotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(NotFoundException::new);
-        cart.deleteBook(book);
+        deleteBook(cart, book);
         cartRepository.save(cart);
         return cartMapper.entityToDto(cart);
+    }
+
+    private void addOrUpdateBook(Cart cart, Book book, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Invalid quantity");
+        }
+        cart.getItems().merge(book, quantity, Integer::sum);
+        cart.setLastModified(LocalDate.now());
+    }
+
+    private void deleteBook(Cart cart, Book book) {
+        cart.getItems().remove(book);
+        cart.setLastModified(LocalDate.now());
     }
 }

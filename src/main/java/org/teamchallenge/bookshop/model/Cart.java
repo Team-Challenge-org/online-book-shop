@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,16 +24,5 @@ public class Cart {
     @Column(name = "count")
     private Map<Book, Integer> items = new HashMap<>();
 
-    public void addOrUpdateBook(Book book, int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Invalid quantity");
-        }
-        items.merge(book, quantity, Integer::sum);
-        lastModified = LocalDate.now();
-    }
 
-    public void deleteBook(Book book) {
-        items.remove(book);
-        lastModified = LocalDate.now();
-    }
 }

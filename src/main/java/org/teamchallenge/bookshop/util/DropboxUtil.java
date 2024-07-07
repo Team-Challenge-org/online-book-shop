@@ -4,7 +4,6 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -13,12 +12,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.teamchallenge.bookshop.exception.AccessTokenRefreshException;
 import org.teamchallenge.bookshop.exception.MissingAccessTokenException;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DropboxUtil {
-    private static String ACCESS_TOKEN = System.getenv("DROPBOX_TOKEN");
+    private static String ACCESS_TOKEN = "";
     private static final String APP_KEY = System.getenv("APP_KEY");
     private static final String APP_SECRET = System.getenv("APP_SECRET");
     private static final String REFRESH_TOKEN = System.getenv("REFRESH_TOKEN");

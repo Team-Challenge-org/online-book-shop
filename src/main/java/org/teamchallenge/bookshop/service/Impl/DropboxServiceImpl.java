@@ -4,7 +4,6 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.CreateFolderErrorException;
 import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.UploadErrorException;
 import com.dropbox.core.v2.files.WriteMode;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.exception.DropBoxException;

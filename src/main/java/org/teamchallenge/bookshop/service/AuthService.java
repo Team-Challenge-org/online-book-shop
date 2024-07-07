@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
+
 import java.util.UUID;
 
 public interface AuthService {

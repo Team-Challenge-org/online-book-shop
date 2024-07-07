@@ -7,6 +7,7 @@ public record UserDto(
         String name,
         String surname,
         String email,
+        String proneNumber,
         String role,
         List<Long> favouriteBookIds,
         long cartId,
