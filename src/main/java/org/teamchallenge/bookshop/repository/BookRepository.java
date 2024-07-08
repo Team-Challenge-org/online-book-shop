@@ -6,15 +6,11 @@ import org.springframework.data.repository.query.Param;
 import org.teamchallenge.bookshop.model.Book;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface BookRepository extends JpaRepository<Book,Long> {
-    @Query(value = "SELECT DISTINCT b.*, bi.* FROM books b " +
-                   "LEFT JOIN book_images bi ON b.id = bi.book_id " +
-                   "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :input, '%')) " +
-                   "ORDER BY b.title " +
-                   "LIMIT 5",
-            nativeQuery = true)
-    List<Book> findByCombinedSimilarity(@Param("input") String input);
+public interface BookRepository extends JpaRepository<Book, Long> {
+
+    Optional<Book> findFirstByTitleContainingIgnoreCase(String title);
 
     @Query("SELECT b FROM Book b LEFT JOIN FETCH b.images WHERE b.isThisSlider = true")
     List<Book> findSliderBooks();

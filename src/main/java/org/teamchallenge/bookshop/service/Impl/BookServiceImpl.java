@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
@@ -23,10 +24,7 @@ import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.DropboxService;
 import org.teamchallenge.bookshop.util.ImageUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -128,12 +126,10 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    @Override
-    public List<BookInCatalogDto> getBookByTitle(String title) {
-        return bookRepository.findByCombinedSimilarity(title)
-                .stream()
+    public BookInCatalogDto getFirstBookByTitle(String title) {
+        return bookRepository.findFirstByTitleContainingIgnoreCase(title)
                 .map(bookMapper::entityToBookCatalogDTO)
-                .toList();
+                .orElseThrow(BookNotFoundException::new);
     }
 
     public Page<BookDto> getAllBooks(Pageable pageable) {
