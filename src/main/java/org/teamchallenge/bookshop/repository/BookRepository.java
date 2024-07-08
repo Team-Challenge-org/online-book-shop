@@ -8,16 +8,17 @@ import org.teamchallenge.bookshop.model.Book;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Long> {
-    @Query(value = "SELECT DISTINCT b.*, book_images.*, " +
-            "similarity(b.title, :input) AS sim_score, " +
-            "(LENGTH(b.title) / (1 + levenshtein(b.title, :input))) AS lev_score, " +
-            "(similarity(b.title, :input) * 0.5 + (LENGTH(b.title) / (1 + levenshtein(b.title, :input))) * 0.5) AS relevance " +
-            "FROM books b " +
-            "LEFT JOIN book_images ON book_images.book_id = b.id " +
-            "WHERE similarity(b.title, :input) > 0.2 " +
-            "OR levenshtein(b.title, :input) < (LENGTH(b.title) / 2) " +
-            "ORDER BY relevance DESC " +
-            "LIMIT 5",
+    @Query(value = "SELECT DISTINCT b.*, book_images.*, \n" +
+                   "       CASE \n" +
+                   "           WHEN b.title ILIKE :input THEN 1.0\n" +
+                   "           WHEN b.title ILIKE :input || '%' THEN 0.8\n" +
+                   "           WHEN b.title ILIKE '%' || :input || '%' THEN 0.6\n" +
+                   "       END AS relevance\n" +
+                   "FROM books b \n" +
+                   "LEFT JOIN book_images ON book_images.book_id = b.id \n" +
+                   "WHERE b.title ILIKE '%' || :input || '%'\n" +
+                   "ORDER BY relevance DESC, b.title\n" +
+                   "LIMIT 5",
             nativeQuery = true)
     List<Book> findByCombinedSimilarity(@Param("input") String input);
 

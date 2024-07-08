@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DropboxUtil {
-    private static String ACCESS_TOKEN = "";
+    private static String ACCESS_TOKEN = System.getenv("DROPBOX_TOKEN");
     private static final String APP_KEY = System.getenv("APP_KEY");
     private static final String APP_SECRET = System.getenv("APP_SECRET");
     private static final String REFRESH_TOKEN = System.getenv("REFRESH_TOKEN");
