@@ -22,7 +22,6 @@ import org.teamchallenge.bookshop.exception.ErrorObject;
 import org.teamchallenge.bookshop.service.BookService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/book")
@@ -103,7 +102,9 @@ public class BookController {
 
     @Operation(summary = "Find book by title", description = "Get an existing book by title")
     @GetMapping("/findByTitle/{title}")
-    public ResponseEntity<BookInCatalogDto> getBookByTitle(@PathVariable String title) {
+    public ResponseEntity<BookInCatalogDto> getBookByTitle(
+            @Parameter(required = true, in = ParameterIn.PATH)
+            @PathVariable String title) {
         return ResponseEntity.ok(bookService.getFirstBookByTitle(title));
     }
     @Operation(

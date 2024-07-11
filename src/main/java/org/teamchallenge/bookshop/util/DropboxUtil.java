@@ -24,6 +24,8 @@ public class DropboxUtil {
     private static final String REFRESH_TOKEN = System.getenv("REFRESH_TOKEN");
     private static final String TOKEN_ENDPOINT = "https://api.dropbox.com/oauth2/token";
 
+
+
     public static DbxClientV2 getClient() throws DbxException {
         ensureAccessToken();
         DbxRequestConfig config = DbxRequestConfig.newBuilder("tcl").build();
@@ -40,7 +42,8 @@ public class DropboxUtil {
             throw new MissingAccessTokenException();
         }
     }
-    private static DbxClientV2 validateClient(DbxClientV2 client, DbxRequestConfig config)  {
+
+    private static DbxClientV2 validateClient(DbxClientV2 client, DbxRequestConfig config) {
         try {
             client.users().getCurrentAccount();
             return client;
@@ -54,8 +57,7 @@ public class DropboxUtil {
         }
     }
 
-
-    private static String refreshAccessToken() throws AccessTokenRefreshException  {
+    private static String refreshAccessToken() throws AccessTokenRefreshException {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(TOKEN_ENDPOINT);
             post.setHeader("Content-Type", "application/x-www-form-urlencoded");

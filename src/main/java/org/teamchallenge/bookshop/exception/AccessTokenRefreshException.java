@@ -7,4 +7,5 @@ public class AccessTokenRefreshException extends RuntimeException {
     public AccessTokenRefreshException() {
         super(ValidationConstants.MISSING_REFRESH_ACCESS_TOKEN);
     }
+
 }
