@@ -6,4 +6,5 @@ public class MissingAccessTokenException extends RuntimeException {
     public MissingAccessTokenException( ) {
         super(ValidationConstants.MISSING_DROPBOX_ACCESS_TOKEN);
     }
+
 }

@@ -26,7 +26,7 @@ public class ScheduledTaskService {
                 .setParameter("weekAgo", oneWeekAgo)
                 .executeUpdate();
     }
-
+    @Transactional
     @Scheduled(cron = "0 0 0 * * *")
     public void deleteExpiredTokens() {
         entityManager.createQuery(

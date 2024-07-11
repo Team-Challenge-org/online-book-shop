@@ -1,7 +1,6 @@
 package org.teamchallenge.bookshop.secutity;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -13,7 +12,6 @@ import org.springframework.util.StringUtils;
 import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
 import org.teamchallenge.bookshop.model.Token;
 import org.teamchallenge.bookshop.model.User;
-import org.teamchallenge.bookshop.repository.TokenRepository;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
@@ -27,16 +25,16 @@ public class JwtService {
     private static final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
             .orElseThrow(SecretKeyNotFoundException::new);
 
-    private final TokenRepository tokenRepository;
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
     public String extractUsername(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("email", String.class);
+
+            return Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("email", String.class);
     }
 
     public String generateJWT(User user) {
@@ -49,18 +47,14 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String jwt) {
+    public boolean isTokenValid(String token) {
         try {
-            Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(jwt);
-            return tokenRepository.findById(jwt).isEmpty();
-        } catch (ExpiredJwtException e) {
-            //expired
-            return false;
-        } catch (JwtException | IllegalArgumentException e) {
+            Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token);
+            return true;
+        } catch ( JwtException e) {
             return false;
         }
     }
-
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
