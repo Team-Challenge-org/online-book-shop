@@ -41,6 +41,8 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated()
                 )
+                .oauth2Login(withDefaults())
+                .formLogin(withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
