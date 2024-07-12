@@ -128,12 +128,10 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    @Override
-    public List<BookInCatalogDto> getBookByTitle(String title) {
-        return bookRepository.findByCombinedSimilarity(title)
-                .stream()
+    public BookInCatalogDto getFirstBookByTitle(String title) {
+        return bookRepository.findFirstByTitleContainingIgnoreCase(title)
                 .map(bookMapper::entityToBookCatalogDTO)
-                .toList();
+                .orElseThrow(BookNotFoundException::new);
     }
 
     public Page<BookDto> getAllBooks(Pageable pageable) {
