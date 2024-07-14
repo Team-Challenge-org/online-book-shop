@@ -29,6 +29,10 @@ public class ExceptionController {
         ErrorObject errorObject = createErrorObject(e.getMessage(), status);
         return new ResponseEntity<>(errorObject, status);
     }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorObject> handleUnexpectedException(Exception e) {
+        return handleException(e, UNEXPECTED_ERROR_OCCURRED, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorObject> notFoundHandler(UserNotFoundException e) {
         return handleException(e, NOT_FOUND_ERROR_OCCURRED, HttpStatus.NOT_FOUND);
@@ -84,5 +88,19 @@ public class ExceptionController {
     @ExceptionHandler(AccessTokenRefreshException.class)
     public ResponseEntity<ErrorObject> missingRefreshAccessToken(AccessTokenRefreshException e) {
         return handleException(e, MISSING_REFRESH_ACCESS_TOKEN, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(ErrorResponseException.class)
+    public ResponseEntity<ErrorObject> handleErrorResponse(ErrorResponseException ex) {
+        ErrorObject errorObject = createErrorObject(ex.getMessage(), ex.getStatus());
+        return new ResponseEntity<>(errorObject, ex.getStatus());
+    }
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorObject> handleNullPointerException(NullPointerException e) {
+        return handleException(e, NULL_POINT_EXCEPTION, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @ExceptionHandler(SuccessResponseException.class)
+    public ResponseEntity<ErrorObject> handleSuccessResponse(SuccessResponseException ex) {
+        ErrorObject successObject = createErrorObject(ex.getMessage(), ex.getStatus());
+        return new ResponseEntity<>(successObject, ex.getStatus());
     }
 }

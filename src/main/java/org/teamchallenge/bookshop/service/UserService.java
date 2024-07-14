@@ -17,6 +17,8 @@ public interface UserService {
 
     List<User> getAllUsers();
 
+    void changeUserPassword(User user, String password);
+
     User getAuthenticatedUser();
 
     Optional<User> findUserByEmail(String email);
@@ -24,4 +26,8 @@ public interface UserService {
     void addBookToFavourites(Long id);
 
     void deleteBookFromFavourites(Long id);
+
+    void createPasswordResetTokenForUser(String userEmail, String token);
+
+    Optional<User> getUserByPasswordResetToken(String token);
 }
