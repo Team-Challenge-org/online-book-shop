@@ -3,17 +3,22 @@ package org.teamchallenge.bookshop.service.Impl;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.teamchallenge.bookshop.config.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.exception.UserNotAuthenticatedException;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
+import org.teamchallenge.bookshop.model.PasswordResetToken;
 import org.teamchallenge.bookshop.model.User;
+import org.teamchallenge.bookshop.repository.PasswordTokenRepository;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.UserService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +28,9 @@ public class UserServiceImpl implements UserService {
     private final BookService bookService;
     private final UserRepository userRepository;
     private final BookMapper bookMapper;
+    private final PasswordTokenRepository passwordTokenRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public List<BookDto> getFavouriteBooks() {
@@ -81,6 +89,52 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+
+    @Transactional
+    public void createPasswordResetTokenForUser(String userEmail, String token) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(UserNotFoundException::new);
+
+        PasswordResetToken existingToken = passwordTokenRepository.findByUser(user);
+        if (existingToken != null) {
+            updateToken(existingToken, token);
+        } else {
+            PasswordResetToken myToken = new PasswordResetToken();
+            myToken.setToken(token);
+            myToken.setUser(user);
+            myToken.setExpiryDate(calculateExpiryDate());
+            passwordTokenRepository.save(myToken);
+        }
+    }
+
+    private void updateToken(PasswordResetToken existingToken, String token) {
+        existingToken.setToken(token);
+        existingToken.setExpiryDate(calculateExpiryDate());
+        passwordTokenRepository.save(existingToken);
+    }
+
+    private Date calculateExpiryDate() {
+        return new Date(System.currentTimeMillis() + PasswordResetToken.EXPIRATION_TIME_IN_MILLIS);
+    }
+
+    @Override
+    public Optional<User> getUserByPasswordResetToken(String token) {
+        return passwordTokenRepository.findByToken(token)
+                .filter(passToken -> !isTokenExpired(passToken))
+                .map(PasswordResetToken::getUser);
+    }
+
+    private boolean isTokenExpired(PasswordResetToken passToken) {
+        return new Date().after(passToken.getExpiryDate());
+    }
+
+
+
+    @Override
+    public void changeUserPassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
