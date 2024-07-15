@@ -19,7 +19,6 @@ import static org.teamchallenge.bookshop.constants.ValidationConstants.PASSWORD_
 @RequestMapping("api/v1/user")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(maxAge = 3600, origins = "*")
 public class UserController {
     private final UserService userService;
     private final PasswordResetService passwordResetService;

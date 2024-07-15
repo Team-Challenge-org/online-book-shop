@@ -16,7 +16,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(maxAge = 3600, origins = "*")
 public class AuthenticationController {
     private final AuthService authService;
     @PostMapping("/register")

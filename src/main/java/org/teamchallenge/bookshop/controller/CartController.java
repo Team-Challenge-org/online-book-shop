@@ -20,7 +20,6 @@ import java.util.UUID;
 @RequestMapping("api/v1/cart")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(maxAge = 3600, origins = "*")
 public class CartController {
     private final CartService cartService;
     private final JwtService jwtService;
