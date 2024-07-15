@@ -17,7 +17,6 @@ public interface UserService {
 
     List<User> getAllUsers();
 
-    void changeUserPassword(User user, String password);
 
     User getAuthenticatedUser();
 
@@ -27,7 +26,4 @@ public interface UserService {
 
     void deleteBookFromFavourites(Long id);
 
-    void createPasswordResetTokenForUser(String userEmail, String token);
-
-    Optional<User> getUserByPasswordResetToken(String token);
 }

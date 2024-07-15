@@ -9,9 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.teamchallenge.bookshop.enums.TokenValidationResult;
 import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
-import org.teamchallenge.bookshop.model.PasswordResetToken;
 import org.teamchallenge.bookshop.model.Token;
 import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.repository.PasswordTokenRepository;
@@ -80,17 +78,5 @@ public class JwtService {
                 .toLocalDateTime();
         return new Token(jwt, localDateTime);
     }
-    public String validatePasswordResetToken(String token) {
-        Optional<PasswordResetToken> passTokenOpt = passwordTokenRepository.findByToken(token);
-        if (passTokenOpt.isEmpty()) {
-            return TokenValidationResult.INVALID.name();
-        }
-        PasswordResetToken passToken = passTokenOpt.get();
-        return isTokenExpired(passToken) ? TokenValidationResult.EXPIRED.name() : TokenValidationResult.VALID.name();
-    }
-    private boolean isTokenExpired(PasswordResetToken passToken) {
-        return new Date().after(passToken.getExpiryDate());
-    }
-
 
 }
