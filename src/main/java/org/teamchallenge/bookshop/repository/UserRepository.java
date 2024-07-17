@@ -19,5 +19,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<Long> findIdByEmail(@Param("email") String email);
     @Query("SELECT u.favourites FROM User u WHERE u.id = :userId")
     List<Book> findFavouritesById(@Param("userId") long userId);
+    @Query("SELECT u FROM User u WHERE u.email = :emailOrPhone OR u.phoneNumber = :emailOrPhone")
+    Optional<User> findByEmailOrPhoneNumber(@Param("emailOrPhone") String emailOrPhone);
 
 }

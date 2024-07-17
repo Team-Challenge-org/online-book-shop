@@ -27,9 +27,13 @@
         }
         .content h2 {
             color: #333;
+            font-size: 26px;
+            font-weight: bold;
         }
         .content p {
             color: #666;
+            font-size: 18px;
+            line-height: 1.6;
         }
         .code {
             font-size: 24px;
@@ -47,14 +51,23 @@
             color: #fff;
             text-decoration: none;
             border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
         }
         .footer {
             text-align: center;
             margin-top: 20px;
         }
+        .footer p {
+            color: #333;
+            font-size: 18px;
+            line-height: 1.6;
+        }
         .footer a {
             color: #4CAF50;
             text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -66,10 +79,11 @@
     <div class="content">
         <h2>Скиньте ваш пароль на Team Challenge Library</h2>
         <p>Ми отримали запит на скидання пароля для вашого профілю на TLC.</p>
-        <p>Скопіюйте та вставте цей код підтвердження, щоб встановити новий пароль:</p>
-        <div class="code">{{token}}</div>
-        <p>Ви також можете скинути свій пароль, натиснувши це посилання:</p>
+        <p>Скиньте свій пароль, натиснувши це посилання:</p>
         <a href="{{reset_link}}" class="btn">Скинути пароль</a>
+    </div>
+    <div class="footer">
+        <p>Якщо виникнуть питання, звертайтеся до нашої саппорт команди <a href="google.com">google.com</a></p>
     </div>
 </div>
 </body>

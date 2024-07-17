@@ -12,18 +12,18 @@ import org.springframework.util.StringUtils;
 import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
 import org.teamchallenge.bookshop.model.Token;
 import org.teamchallenge.bookshop.model.User;
-import org.teamchallenge.bookshop.repository.PasswordTokenRepository;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class JwtService {
-    private final PasswordTokenRepository passwordTokenRepository;
 
     private static final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
             .orElseThrow(SecretKeyNotFoundException::new);
@@ -31,20 +31,37 @@ public class JwtService {
 
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
     public String extractUsername(String token) {
-
-            return Jwts.parser()
-                    .verifyWith(getSignInKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .get("email", String.class);
+        Claims claims = Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        if (claims.containsKey("email")) {
+            return claims.get("email", String.class);
+        }
+        else if (claims.containsKey("phoneNumber")) {
+            return claims.get("phoneNumber", String.class);
+        }
+        else {
+            return claims.getSubject();
+        }
     }
 
     public String generateJWT(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        if (user.getEmail() != null) {
+            claims.put("email", user.getEmail());
+        }
+        if (user.getPhoneNumber() != null) {
+            claims.put("phoneNumber", user.getPhoneNumber());
+        }
+        claims.put("cartId", user.getCart().getId());
+
+        String subject = user.getEmail() != null ? user.getEmail() : user.getPhoneNumber();
+
         return Jwts.builder()
-                .claim("email", user.getEmail())
-                .claim("cartId", user.getCart().getId())
-                .subject(user.getEmail())
+                .claims(claims)
+                .subject(subject)
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();

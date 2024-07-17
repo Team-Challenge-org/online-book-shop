@@ -19,12 +19,16 @@ public class UserDetailsImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String email)   {
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    public UserDetails loadUserByUsername(String emailOrPhone) {
+        User user = userRepository.findByEmailOrPhoneNumber(emailOrPhone)
+                .orElseThrow(UserNotFoundException::new);
+
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                emailOrPhone,
                 user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()))
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
         );
     }
+
 }
+

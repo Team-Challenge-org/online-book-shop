@@ -23,7 +23,7 @@ public class User   {
     private String surname;
     @Column(name = "email",unique = true)
     private String email;
-    private String proneNumber;
+    private String phoneNumber;
     private String password;
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'USER'")

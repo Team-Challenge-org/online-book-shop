@@ -49,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
         user.setName(registerRequest.getFirstName());
         user.setSurname(registerRequest.getSurname());
         user.setEmail(registerRequest.getEmail());
+        user.setPhoneNumber(registerRequest.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(Role.USER);
         Cart cart;
@@ -70,13 +71,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse auth(AuthRequest authRequest) {
+        User user = userRepository.findByEmailOrPhoneNumber(authRequest.getEmailOrPhone())
+                .orElseThrow(UserNotFoundException::new);
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authRequest.getEmail(),
+                        authRequest.getEmailOrPhone(),
                         authRequest.getPassword()
                 )
         );
-        User user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow(UserNotFoundException::new);
+
         return AuthenticationResponse.builder()
                 .token(jwtService.generateJWT(user))
                 .build();
