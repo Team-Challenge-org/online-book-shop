@@ -1,6 +1,5 @@
 package org.teamchallenge.bookshop.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,9 +43,8 @@ public class UserController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity<String> resetPassword(HttpServletRequest request, @RequestParam String userEmail) {
-        String appUrl = getAppUrl(request);
-        passwordResetService.initiatePasswordReset(userEmail, appUrl);
+    public ResponseEntity<String> resetPassword( @RequestParam String userEmail) {
+        passwordResetService.initiatePasswordReset(userEmail);
         return ResponseEntity.ok("Password reset link sent to your email");
     }
 
@@ -56,7 +54,4 @@ public class UserController {
         return ResponseEntity.ok(PASSWORD_SAVED);
     }
 
-    private String getAppUrl(HttpServletRequest request) {
-        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-    }
 }

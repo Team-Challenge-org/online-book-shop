@@ -29,10 +29,10 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
 
     @Override
-    public void initiatePasswordReset(String userEmail, String appUrl) {
+    public void initiatePasswordReset(String userEmail) {
         String token = UUID.randomUUID().toString();
         createPasswordResetTokenForUser(userEmail, token);
-        String resetUrl = appUrl + "/api/v1/user/reset_password?token=" + token;
+        String resetUrl = "https://online-book-shop-client.onrender.com/api/v1/user/reset_password?token=" + token;
         sendMailService.sendResetTokenEmail(resetUrl, token, userEmail);
     }
 
