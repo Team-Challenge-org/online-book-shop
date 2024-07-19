@@ -1,28 +1,40 @@
 package org.teamchallenge.bookshop.secutity;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
+import org.teamchallenge.bookshop.model.CustomOAuth2User;
+import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
+import org.teamchallenge.bookshop.service.CustomOAuth2UserService;
+import org.teamchallenge.bookshop.service.OAuth2Service;
 
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserDetailsService userDetailsService;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    @Lazy
+    private final OAuth2Service oAuth2Service;
+    @Lazy
+    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -43,8 +55,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(this::oauth2AuthenticationSuccessHandler)
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -55,10 +69,22 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(authenticationProvider)
                 .build();
     }
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+
+    private void oauth2AuthenticationSuccessHandler(HttpServletRequest request,
+                                                    HttpServletResponse response,
+                                                    Authentication authentication) throws IOException, ServletException {
+        CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+        OAuth2UserInfo userInfo = new OAuth2UserInfo();
+        userInfo.setName(oAuth2User.getName());
+        userInfo.setEmail(oAuth2User.getEmail());
+        userInfo.setProvider(oAuth2User.getProvider());
+        userInfo.setProviderId(oAuth2User.getProviderId());
+
+        AuthenticationResponse authResponse = oAuth2Service.processOAuth2Authentication(userInfo);
+
+        response.sendRedirect("/oauth2/success?token=" + authResponse.getToken());
     }
 }

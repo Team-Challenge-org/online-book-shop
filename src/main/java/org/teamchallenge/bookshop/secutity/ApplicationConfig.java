@@ -14,7 +14,7 @@ import org.teamchallenge.bookshop.service.Impl.UserDetailsImpl;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-  private final   UserDetailsImpl userDetailsService;
+    private final UserDetailsImpl userDetailsService;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

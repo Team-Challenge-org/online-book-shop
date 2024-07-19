@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.UserDto;
+import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.service.PasswordResetService;
 import org.teamchallenge.bookshop.service.UserService;
 
@@ -52,6 +55,16 @@ public class UserController {
     public ResponseEntity<String> savePassword(@RequestParam String token, @RequestParam String newPassword) {
         passwordResetService.saveNewPassword(token, newPassword);
         return ResponseEntity.ok(PASSWORD_SAVED);
+    }
+    @PutMapping("/update")
+    private ResponseEntity<UserDto> userUpdate(@RequestBody UserDto userDto) {
+        UserDto updatedUserDto = userService.updateUser(userDto);
+        return ResponseEntity.ok(updatedUserDto);
+    }
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<UserDto> findById(@Valid @PathVariable Long id){
+        UserDto userDto = userService.findUserById(id);
+        return ResponseEntity.ok(userDto);
     }
 
 }

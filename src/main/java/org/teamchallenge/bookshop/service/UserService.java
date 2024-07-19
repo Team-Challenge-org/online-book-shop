@@ -1,6 +1,7 @@
 package org.teamchallenge.bookshop.service;
 
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.UserDto;
 import org.teamchallenge.bookshop.model.User;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface UserService {
 
     Optional<User> getUserById(Long id);
 
-    User updateUser(User user);
+    UserDto updateUser(UserDto userDto);
 
     void deleteUser(Long id);
 
@@ -26,4 +27,5 @@ public interface UserService {
 
     void deleteBookFromFavourites(Long id);
 
+    UserDto findUserById(Long id);
 }

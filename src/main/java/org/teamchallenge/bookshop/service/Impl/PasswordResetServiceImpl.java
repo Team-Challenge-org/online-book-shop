@@ -32,7 +32,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     public void initiatePasswordReset(String userEmail) {
         String token = UUID.randomUUID().toString();
         createPasswordResetTokenForUser(userEmail, token);
-        String resetUrl = "https://online-book-shop-client.onrender.com/api/v1/user/reset_password?token=" + token;
+        String resetUrl = " https://online-book-shop-client.onrender.com/reset_password?token=" + token;
         sendMailService.sendResetTokenEmail(resetUrl, token, userEmail);
     }
 

@@ -25,6 +25,8 @@ public class User   {
     private String email;
     private String phoneNumber;
     private String password;
+    private String provider;
+    private String providerId;
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'USER'")
     private Role role;

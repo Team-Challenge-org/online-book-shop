@@ -1,13 +1,12 @@
-package org.teamchallenge.bookshop.service.Impl;
+package org.teamchallenge.bookshop.service.impl;
 
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
 import org.teamchallenge.bookshop.enums.Role;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
@@ -28,7 +27,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -36,9 +35,6 @@ public class AuthServiceImpl implements AuthService {
     private final CartRepository cartRepository;
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
-
-    @Autowired
-    EntityManager entityManager;
 
     @Override
     public AuthenticationResponse register(RegisterRequest registerRequest, UUID cartId) {

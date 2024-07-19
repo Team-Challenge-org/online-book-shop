@@ -1,6 +1,7 @@
 package org.teamchallenge.bookshop.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
