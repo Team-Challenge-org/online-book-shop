@@ -16,10 +16,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.teamchallenge.bookshop.Oauth2.CustomOAuth2User;
+import org.teamchallenge.bookshop.Oauth2.CustomOAuth2UserService;
 import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
-import org.teamchallenge.bookshop.model.CustomOAuth2User;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
-import org.teamchallenge.bookshop.service.CustomOAuth2UserService;
 import org.teamchallenge.bookshop.service.OAuth2Service;
 
 import java.io.IOException;
@@ -46,7 +46,6 @@ public class SecurityConfig {
                                 "/api/v1/auth/**",
                                 "/api/v1/mail/**",
                                 "/api/v1/user/**",
-                                "/api/v1/book/**",
                                 "/api/v1/cart/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -66,7 +65,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(authenticationProvider)

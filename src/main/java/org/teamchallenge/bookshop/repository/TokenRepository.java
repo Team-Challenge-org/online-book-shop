@@ -6,4 +6,5 @@ import org.teamchallenge.bookshop.model.Token;
 
 @Repository
 public interface TokenRepository extends JpaRepository<Token, String> {
+    Token findByToken(String token);
 }

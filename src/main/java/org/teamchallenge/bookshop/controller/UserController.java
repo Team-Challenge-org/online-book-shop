@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.UserDto;
-import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.service.PasswordResetService;
 import org.teamchallenge.bookshop.service.UserService;
 
@@ -66,5 +65,9 @@ public class UserController {
         UserDto userDto = userService.findUserById(id);
         return ResponseEntity.ok(userDto);
     }
-
+    @GetMapping("/userByToken")
+    public ResponseEntity<UserDto> getUserDataByToken(@RequestParam String token) {
+        UserDto userDto = userService.getUserByToken(token);
+        return ResponseEntity.ok(userDto);
+    }
 }

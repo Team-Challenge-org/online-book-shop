@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
 import org.teamchallenge.bookshop.model.Token;
 import org.teamchallenge.bookshop.model.User;
+import org.teamchallenge.bookshop.repository.TokenRepository;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
+        private final TokenRepository tokenRepository;
 
     private static final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
             .orElseThrow(SecretKeyNotFoundException::new);
@@ -95,5 +97,8 @@ public class JwtService {
                 .toLocalDateTime();
         return new Token(jwt, localDateTime);
     }
-
+    public boolean isTokenBlacklisted(String jwt) {
+        Token token = tokenRepository.findByToken(jwt);
+        return token != null;
+    }
 }

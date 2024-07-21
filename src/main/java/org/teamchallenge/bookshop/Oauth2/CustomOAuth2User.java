@@ -1,4 +1,4 @@
-package org.teamchallenge.bookshop.model;
+package org.teamchallenge.bookshop.Oauth2;
 
 import lombok.Builder;
 import lombok.Getter;

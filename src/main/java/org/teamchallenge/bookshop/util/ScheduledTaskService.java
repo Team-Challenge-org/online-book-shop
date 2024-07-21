@@ -1,4 +1,4 @@
-package org.teamchallenge.bookshop.service;
+package org.teamchallenge.bookshop.util;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

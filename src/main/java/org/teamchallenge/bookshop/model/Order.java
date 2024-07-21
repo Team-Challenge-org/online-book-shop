@@ -2,9 +2,10 @@ package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
+import org.teamchallenge.bookshop.enums.OrderStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +22,8 @@ public class Order {
     @MapKeyJoinColumn(name = "books.id")
     @Column(name = "count")
     private Map<Book, Integer> books = new HashMap<>();
-    @NonNull
-    private String status;
-    private int amount;
-    @NonNull
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+    private BigDecimal total;
     private LocalDateTime statusChange;
 }

@@ -13,6 +13,7 @@ import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.repository.UserRepository;
+import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.UserService;
 
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BookMapper bookMapper;
     private final UserMapper userMapper;
+    private final JwtService jwtService;
 
 
 
@@ -89,7 +91,12 @@ public class UserServiceImpl implements UserService {
         user.setFavourites(list);
         userRepository.save(user);
     }
-
+    public UserDto getUserByToken(String jwt) {
+        String username = jwtService.extractUsername(jwt);
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(UserNotFoundException::new);
+        return userMapper.entityToDto(user);
+    }
     @Override
     public UserDto findUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);

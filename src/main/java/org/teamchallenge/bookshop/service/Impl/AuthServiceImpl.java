@@ -1,4 +1,4 @@
-package org.teamchallenge.bookshop.service.impl;
+package org.teamchallenge.bookshop.service.Impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
 import org.teamchallenge.bookshop.enums.Role;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;

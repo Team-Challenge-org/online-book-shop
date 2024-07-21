@@ -17,7 +17,7 @@ public interface UserService {
     void deleteUser(Long id);
 
     List<User> getAllUsers();
-
+    UserDto getUserByToken(String jwt);
 
     User getAuthenticatedUser();
 

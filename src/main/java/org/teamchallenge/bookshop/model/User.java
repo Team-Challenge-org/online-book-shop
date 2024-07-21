@@ -35,7 +35,7 @@ public class User   {
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> favourites = new ArrayList<>();
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
     private Cart cart;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
