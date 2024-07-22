@@ -97,6 +97,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(UserNotFoundException::new);
         return userMapper.entityToDto(user);
     }
+
     @Override
     public UserDto findUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
