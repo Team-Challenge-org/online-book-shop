@@ -1,11 +1,12 @@
 package org.teamchallenge.bookshop.service.Impl;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.teamchallenge.bookshop.config.BookMapper;
-import org.teamchallenge.bookshop.config.UserMapper;
+import org.teamchallenge.bookshop.mapper.BookMapper;
+import org.teamchallenge.bookshop.mapper.UserMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.UserDto;
 import org.teamchallenge.bookshop.exception.UserNotAuthenticatedException;
@@ -30,7 +31,6 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
 
 
-
     @Override
     public List<BookDto> getFavouriteBooks() {
         User user = getAuthenticatedUser();
@@ -44,7 +44,9 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getUserById(Long id) {
         return Optional.of(userRepository.findById(id)).orElseThrow(UserNotFoundException::new);
     }
+
     @Override
+    @Transactional
     public UserDto updateUser(UserDto userDto) {
         User existingUser = userRepository.findById(userDto.id())
                 .orElseThrow(UserNotFoundException::new);
@@ -91,6 +93,7 @@ public class UserServiceImpl implements UserService {
         user.setFavourites(list);
         userRepository.save(user);
     }
+
     public UserDto getUserByToken(String jwt) {
         String username = jwtService.extractUsername(jwt);
         User user = userRepository.findByEmail(username)

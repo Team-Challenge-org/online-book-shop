@@ -1,4 +1,4 @@
-package org.teamchallenge.bookshop.config;
+package org.teamchallenge.bookshop.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

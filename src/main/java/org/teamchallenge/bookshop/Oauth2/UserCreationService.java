@@ -20,6 +20,7 @@ public class UserCreationService {
     public User createNewUser(OAuth2UserInfo oauth2UserInfo) {
         User newUser = new User();
         newUser.setName(oauth2UserInfo.getName());
+        newUser.setSurname(oauth2UserInfo.getSurname());
         newUser.setEmail(oauth2UserInfo.getEmail());
         newUser.setProvider(oauth2UserInfo.getProvider());
         newUser.setProviderId(oauth2UserInfo.getProviderId());

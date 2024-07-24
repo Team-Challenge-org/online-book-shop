@@ -32,9 +32,11 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        return oauth2User.getAttribute("name");
+        return oauth2User.getAttribute("given_name");
     }
-
+    public String getSurname() {
+        return oauth2User.getAttribute("family_name");
+    }
     public String getEmail() {
         return oauth2User.getAttribute("email");
     }

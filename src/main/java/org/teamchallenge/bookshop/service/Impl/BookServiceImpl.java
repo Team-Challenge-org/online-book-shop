@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.teamchallenge.bookshop.config.BookMapper;
+import org.teamchallenge.bookshop.mapper.BookMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.BookInCatalogDto;
 import org.teamchallenge.bookshop.dto.CategoryDto;
@@ -195,7 +195,6 @@ public class BookServiceImpl implements BookService {
         List<BookDto> bookDtoList = bookList.stream()
                 .map(bookMapper::entityToDTO)
                 .toList();
-
         CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         Root<Book> countRoot = countQuery.from(Book.class);
         List<Predicate> newPredicates = getPredicatesForFilter(criteriaBuilder, categoryId, author, priceMin, priceMax, countRoot);

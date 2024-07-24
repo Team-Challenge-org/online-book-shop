@@ -26,6 +26,5 @@ public interface UserService {
     void addBookToFavourites(Long id);
 
     void deleteBookFromFavourites(Long id);
-
     UserDto findUserById(Long id);
 }

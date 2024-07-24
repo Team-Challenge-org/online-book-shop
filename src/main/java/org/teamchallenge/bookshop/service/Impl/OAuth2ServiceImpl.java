@@ -20,20 +20,19 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 
     @Override
     public AuthenticationResponse processOAuth2Authentication(OAuth2UserInfo oauth2UserInfo) {
-        User user = userRepository.findByEmailAndProvider(oauth2UserInfo.getEmail(), oauth2UserInfo.getProvider())
-                .orElseGet(() -> userRepository.findByProviderId(oauth2UserInfo.getProviderId())
-                        .orElseGet(() -> userCreationService.createNewUser(oauth2UserInfo)));
-
-        user = updateUserInfo(user, oauth2UserInfo);
+        User user = userRepository.findByEmail(oauth2UserInfo.getEmail())
+                .map(existingUser -> {
+                    existingUser.setName(oauth2UserInfo.getName());
+                    existingUser.setSurname(oauth2UserInfo.getSurname());
+                    existingUser.setProvider(oauth2UserInfo.getProvider());
+                    existingUser.setProviderId(oauth2UserInfo.getProviderId());
+                    return userRepository.save(existingUser);
+                })
+                .orElseGet(() -> userCreationService.createNewUser(oauth2UserInfo));
 
         return AuthenticationResponse.builder()
                 .token(jwtService.generateJWT(user))
                 .build();
     }
 
-    private User updateUserInfo(User existingUser, OAuth2UserInfo oauth2UserInfo) {
-        existingUser.setName(oauth2UserInfo.getName());
-        existingUser.setProviderId(oauth2UserInfo.getProviderId());
-        return userRepository.save(existingUser);
-    }
 }

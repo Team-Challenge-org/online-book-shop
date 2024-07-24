@@ -3,7 +3,7 @@ package org.teamchallenge.bookshop.service.Impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.teamchallenge.bookshop.config.CartMapper;
+import org.teamchallenge.bookshop.mapper.CartMapper;
 import org.teamchallenge.bookshop.dto.CartDto;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.model.Book;

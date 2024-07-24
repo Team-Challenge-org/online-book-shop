@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface OrderService {
-    Optional<Order> getOrderById(Long id);
+    Optional<OrderDto> getOrderById(Long id);
 
-    Order updateOrder(Long id, OrderStatus status, LocalDateTime time);
+    OrderDto updateOrder(Long id, OrderDto orderDto);
 
     void deleteOrder(Long id);
 
-    Order createOrder(OrderDto orderDto);
+    OrderDto createOrder(OrderDto orderDto);
 }

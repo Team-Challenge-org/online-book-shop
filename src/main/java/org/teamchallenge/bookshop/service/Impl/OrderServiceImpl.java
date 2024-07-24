@@ -3,8 +3,9 @@ package org.teamchallenge.bookshop.service.Impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.dto.OrderDto;
-import org.teamchallenge.bookshop.enums.OrderStatus;
+import org.teamchallenge.bookshop.exception.BookNotFoundException;
 import org.teamchallenge.bookshop.exception.OrderIdNotFoundException;
+import org.teamchallenge.bookshop.mapper.OrderMapper;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.model.Order;
 import org.teamchallenge.bookshop.repository.BookRepository;
@@ -22,37 +23,30 @@ import java.util.Optional;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final BookRepository bookRepository;
+    private final OrderMapper orderMapper;
 
     @Override
-    public Optional<Order> getOrderById(Long id) {
-        return Optional.of(orderRepository.findById(id)).orElseThrow(OrderIdNotFoundException::new);
-    }
-
-    @Override
-    public Order updateOrder(Long id, OrderStatus status, LocalDateTime time) {
+    public Optional<OrderDto> getOrderById(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(OrderIdNotFoundException::new);
-        order.setStatus(status);
-        order.setStatusChange(time);
-        return orderRepository.save(order);
+        return Optional.of(orderMapper.toOrderDto(order));
     }
 
-    @Override
-    public void deleteOrder(Long id) {
-        orderRepository.findById(id).orElseThrow(OrderIdNotFoundException::new);
-        orderRepository.deleteById(id);
-    }
 
     @Override
-    public Order createOrder(OrderDto orderDto) {
-        Order order = new Order();
+    public OrderDto updateOrder(Long id, OrderDto orderDto) {
+        Order order = orderRepository.findById(id).orElseThrow(OrderIdNotFoundException::new);
         order.setStatus(orderDto.status());
-        order.setStatusChange(LocalDateTime.now());
+        order.setStatusChange(LocalDateTime.now().withSecond(0).withNano(0));
 
+        return getOrderDto(orderDto, order);
+    }
+
+    private OrderDto getOrderDto(OrderDto orderDto, Order order) {
         Map<Book, Integer> books = new HashMap<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (Map.Entry<Long, Integer> entry : orderDto.books().entrySet()) {
-            Book book = bookRepository.findById(entry.getKey()).orElseThrow(() -> new RuntimeException("Book not found"));
+            Book book = bookRepository.findById(entry.getKey()).orElseThrow(BookNotFoundException::new);
             books.put(book, entry.getValue());
 
             BigDecimal bookPrice = book.getPrice();
@@ -62,7 +56,24 @@ public class OrderServiceImpl implements OrderService {
 
         order.setBooks(books);
         order.setTotal(totalAmount);
+        orderRepository.save(order);
 
-        return orderRepository.save(order);
+        return orderMapper.toOrderDto(order);
+    }
+
+
+    @Override
+    public void deleteOrder(Long id) {
+        orderRepository.findById(id).orElseThrow(OrderIdNotFoundException::new);
+        orderRepository.deleteById(id);
+    }
+
+    @Override
+    public OrderDto createOrder(OrderDto orderDto) {
+        Order order = new Order();
+        order.setStatus(orderDto.status());
+        order.setStatusChange(LocalDateTime.now());
+
+        return getOrderDto(orderDto, order);
     }
 }

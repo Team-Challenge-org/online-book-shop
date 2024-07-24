@@ -51,7 +51,8 @@ public class SecurityConfig {
                                 "/api/v1/cart/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/v2/api-docs"
+                                "/v2/api-docs",
+                                "/"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -80,6 +81,7 @@ public class SecurityConfig {
                                                     Authentication authentication) throws IOException, ServletException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         OAuth2UserInfo userInfo = new OAuth2UserInfo();
+        userInfo.setSurname(oAuth2User.getSurname());
         userInfo.setName(oAuth2User.getName());
         userInfo.setEmail(oAuth2User.getEmail());
         userInfo.setProvider(oAuth2User.getProvider());
