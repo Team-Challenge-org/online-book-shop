@@ -68,6 +68,21 @@ public class SendMailServiceImpl implements SendMailService {
         }
     }
 
+    @Override
+    public String sendSuccessRegistrationEmail(String mail) {
+        if (!isValidEmail(mail)) {
+            return INVALID_EMAIL_ADDRESS;
+        }
+
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setSubject("Welcome to Team Challenge");
+        simpleMailMessage.setText("Hello from Team Challenge, You successfully registered!");
+        simpleMailMessage.setTo(mail);
+        simpleMailMessage.setFrom(mailAddress);
+        javaMailSender.send(simpleMailMessage);
+        return "Mail sent successfully";
+    }
+
     private String loadEmailTemplate() throws IOException {
         ClassPathResource resource = new ClassPathResource("TCL.html");
         return StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);

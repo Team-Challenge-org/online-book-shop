@@ -5,13 +5,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
+import org.teamchallenge.bookshop.exception.NotFoundException;
+import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
 import org.teamchallenge.bookshop.service.AuthService;
 import org.teamchallenge.bookshop.service.OAuth2Service;
+import org.teamchallenge.bookshop.service.SendMailService;
 
 import java.util.UUID;
 
@@ -21,13 +25,21 @@ import java.util.UUID;
 public class AuthenticationController {
     private final AuthService authService;
     private final OAuth2Service oAuth2Service;
+    private final SendMailService sendMailService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register (
             @Parameter(description = "Id of cart")
             @CookieValue(required = false, name = "cartId") UUID cartId,
             @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request, cartId));
+        try {
+            sendMailService.sendSuccessRegistrationEmail(request.getEmail());
+            return ResponseEntity.ok(authService.register(request, cartId));
+        } catch (UserAlreadyExistsException e) {
+            throw new UserAlreadyExistsException();
+        } catch (NotFoundException e) {
+            throw new NotFoundException();
+        }
     }
 
     @PostMapping("/login")
