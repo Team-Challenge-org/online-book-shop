@@ -1,11 +1,19 @@
 package org.teamchallenge.bookshop.dto;
 
-import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
-public record CartDto(
-       List<CartItemDto> items,
-        BigDecimal total
-) {
-
+@Setter
+@Getter
+@RequiredArgsConstructor
+public class CartDto {
+    private UUID id;
+    private Boolean isPermanent;
+    private LocalDate lastModified;
+    private List<BookDto> items;
 }

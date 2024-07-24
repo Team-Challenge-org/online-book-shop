@@ -23,7 +23,10 @@ public class User   {
     private String surname;
     @Column(name = "email",unique = true)
     private String email;
+    private String phoneNumber;
     private String password;
+    private String provider;
+    private String providerId;
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'USER'")
     private Role role;
@@ -32,7 +35,8 @@ public class User   {
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> favourites = new ArrayList<>();
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
     private Cart cart;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "users_orders",

@@ -2,9 +2,10 @@ package org.teamchallenge.bookshop.config;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.teamchallenge.bookshop.dto.BookDto;
 import org.teamchallenge.bookshop.dto.CartDto;
-import org.teamchallenge.bookshop.dto.CartItemDto;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.model.Cart;
 
@@ -12,31 +13,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Mapper(config = MapperConfig.class)
-public interface CartMapper {
-    @Mappings({
-            @Mapping(source = "items", target = "items"),
-            @Mapping(source = "total", target = "total")
-    })
-    CartDto entityToDTO(Cart cart);
+@Mapper(componentModel = "spring", uses = {BookMapper.class})
+public abstract class CartMapper {
 
-    @Mappings({
-            @Mapping(source = "items", target = "items"),
-            @Mapping(source = "total", target = "total")
-    })
-    Cart dtoToEntity(CartDto cartDto);
+    @Autowired
+    protected BookMapper bookMapper;
 
-    default List<CartItemDto> map(Map<Book, Integer> items) {
-        return items.entrySet().stream()
-                .map(entry -> new CartItemDto(entry.getKey(), entry.getValue()))
+    @Mapping(target = "items", source = "items", qualifiedByName = "mapToList")
+    public abstract CartDto entityToDto(Cart cart);
+
+    @Mapping(target = "items", source = "items", qualifiedByName = "listToMap")
+    public abstract Cart dtoToEntity(CartDto cartDto);
+
+    @Named("mapToList")
+    public List<BookDto> mapToList(Map<Book, Integer> map) {
+        return map.entrySet()
+                .stream()
+                .map(entry -> {
+                    BookDto bookDto = bookMapper.entityToDTO(entry.getKey());
+                    bookDto.setQuantity(entry.getValue());
+                    return bookDto;
+                })
                 .collect(Collectors.toList());
     }
 
-    default Map<Book, Integer> map(List<CartItemDto> items) {
-        return items.stream()
+    @Named("listToMap")
+    public Map<Book, Integer> listToMap(List<BookDto> list) {
+        return list.stream()
                 .collect(Collectors.toMap(
-                        CartItemDto::book,
-                        CartItemDto::count
+                        bookDto -> bookMapper.dtoToEntity(bookDto),
+                        BookDto::getQuantity
                 ));
     }
 }

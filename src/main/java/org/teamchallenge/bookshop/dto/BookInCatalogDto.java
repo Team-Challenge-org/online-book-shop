@@ -1,17 +1,22 @@
 package org.teamchallenge.bookshop.dto;
 
-import org.teamchallenge.bookshop.enums.Available;
-import org.teamchallenge.bookshop.enums.Category;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-public record BookInCatalogDto(
-        long id,
-        String title,
-        BigDecimal price,
-        Category category,
-        Boolean isThisNotSlider,
-        Available available,
-        String titleImage,
-        String authors
-) {}
+
+@Getter
+@Setter
+@RequiredArgsConstructor
+public class BookInCatalogDto {
+    private long id;
+    private String title;
+    private BigDecimal price;
+    private String category;
+    private Boolean isThisSlider;
+    private String titleImage;
+    private String authors;
+    private final int quantity = 1;
+}

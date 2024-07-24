@@ -5,12 +5,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.config.BookMapper;
+import org.teamchallenge.bookshop.config.UserMapper;
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.UserDto;
 import org.teamchallenge.bookshop.exception.UserNotAuthenticatedException;
 import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.Book;
 import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.repository.UserRepository;
+import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.BookService;
 import org.teamchallenge.bookshop.service.UserService;
 
@@ -23,12 +26,15 @@ public class UserServiceImpl implements UserService {
     private final BookService bookService;
     private final UserRepository userRepository;
     private final BookMapper bookMapper;
+    private final UserMapper userMapper;
+    private final JwtService jwtService;
+
+
 
     @Override
     public List<BookDto> getFavouriteBooks() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return userRepository.findFavouritesById(userRepository.findIdByEmail(email).get())
+        User user = getAuthenticatedUser();
+        return userRepository.findFavouritesById(userRepository.findIdByEmail(user.getEmail()).get())
                 .stream()
                 .map(bookMapper::entityToDTO)
                 .toList();
@@ -38,11 +44,15 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getUserById(Long id) {
         return Optional.of(userRepository.findById(id)).orElseThrow(UserNotFoundException::new);
     }
-
     @Override
-    public User updateUser(User user) {
-        userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
-        return userRepository.save(user);
+    public UserDto updateUser(UserDto userDto) {
+        User existingUser = userRepository.findById(userDto.id())
+                .orElseThrow(UserNotFoundException::new);
+
+        userMapper.updateUserFromDto(userDto, existingUser);
+        User updatedUser = userRepository.save(existingUser);
+
+        return userMapper.entityToDto(updatedUser);
     }
 
     @Override
@@ -80,6 +90,18 @@ public class UserServiceImpl implements UserService {
         list.removeIf(x -> x.getId() == id);
         user.setFavourites(list);
         userRepository.save(user);
+    }
+    public UserDto getUserByToken(String jwt) {
+        String username = jwtService.extractUsername(jwt);
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(UserNotFoundException::new);
+        return userMapper.entityToDto(user);
+    }
+
+    @Override
+    public UserDto findUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        return userMapper.entityToDto(user);
     }
 
     public User getAuthenticatedUser() {

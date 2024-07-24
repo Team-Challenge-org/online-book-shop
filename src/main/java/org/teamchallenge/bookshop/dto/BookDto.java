@@ -2,8 +2,6 @@ package org.teamchallenge.bookshop.dto;
 
 
 import lombok.*;
-import org.teamchallenge.bookshop.enums.Available;
-import org.teamchallenge.bookshop.enums.Category;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,11 +18,11 @@ public class BookDto {
     private String full_description;
     private String short_description;
     private BigDecimal price;
-    private Category category;
-    private Boolean isThisNotSlider;
-    private Available available;
+    private String category;
+    private Boolean isThisSlider;
     private String titleImage;
     private String authors;
     private LocalDate timeAdded;
     private List<String> images;
+    private int quantity ;
 }

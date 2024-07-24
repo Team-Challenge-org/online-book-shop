@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,17 +8,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.BookDto;
+import org.teamchallenge.bookshop.dto.UserDto;
+import org.teamchallenge.bookshop.service.PasswordResetService;
 import org.teamchallenge.bookshop.service.UserService;
 
 import java.util.List;
+
+import static org.teamchallenge.bookshop.constants.ValidationConstants.PASSWORD_SAVED;
 
 @RestController
 @RequestMapping("api/v1/user")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(maxAge = 3600, origins = "*")
 public class UserController {
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/favourites/add")
@@ -37,5 +42,32 @@ public class UserController {
     @GetMapping("/favourites")
     public ResponseEntity<List<BookDto>> getUserFavourites() {
         return ResponseEntity.ok(userService.getFavouriteBooks());
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<String> resetPassword( @RequestParam String userEmail) {
+        passwordResetService.initiatePasswordReset(userEmail);
+        return ResponseEntity.ok("Password reset link sent to your email");
+    }
+
+    @PostMapping("/savePassword")
+    public ResponseEntity<String> savePassword(@RequestParam String token, @RequestParam String newPassword) {
+        passwordResetService.saveNewPassword(token, newPassword);
+        return ResponseEntity.ok(PASSWORD_SAVED);
+    }
+    @PutMapping("/update")
+    private ResponseEntity<UserDto> userUpdate(@RequestBody UserDto userDto) {
+        UserDto updatedUserDto = userService.updateUser(userDto);
+        return ResponseEntity.ok(updatedUserDto);
+    }
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<UserDto> findById(@Valid @PathVariable Long id){
+        UserDto userDto = userService.findUserById(id);
+        return ResponseEntity.ok(userDto);
+    }
+    @GetMapping("/userByToken")
+    public ResponseEntity<UserDto> getUserDataByToken(@RequestParam String token) {
+        UserDto userDto = userService.getUserByToken(token);
+        return ResponseEntity.ok(userDto);
     }
 }

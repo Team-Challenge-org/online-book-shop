@@ -13,6 +13,7 @@ import static org.teamchallenge.bookshop.constants.ValidationConstants.*;
 public class RegisterRequest {
     private String firstName;
     private String surname;
+    private String phoneNumber;
     @Pattern(regexp = EMAIL_REGEXP, message = WRONG_EMAIL_FORMAT)
     private String email;
     @Pattern(regexp = PASSWORD_REGEXP, message = WRONG_PASSWORD_CREATION_MESSAGE)
