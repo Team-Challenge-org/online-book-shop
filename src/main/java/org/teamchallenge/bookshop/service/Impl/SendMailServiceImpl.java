@@ -40,7 +40,7 @@ public class SendMailServiceImpl implements SendMailService {
 
     @Override
     public String send(String mail) {
-        if (!isValidEmail(mail)) {
+        if (isValidEmail(mail)) {
             return INVALID_EMAIL_ADDRESS;
         }
 
@@ -53,7 +53,7 @@ public class SendMailServiceImpl implements SendMailService {
         return "Mail sent successfully";
     }
     private boolean isValidEmail(String email) {
-        return email != null && EMAIL_REGEX_PATTERN.matcher(email).matches();
+        return email == null || !EMAIL_REGEX_PATTERN.matcher(email).matches();
     }
 
     public void sendResetTokenEmail(String resetUrl, String token, String userEmail) {
@@ -66,6 +66,21 @@ public class SendMailServiceImpl implements SendMailService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load email template", e);
         }
+    }
+
+    @Override
+    public String sendSuccessRegistrationEmail(String mail) {
+        if (isValidEmail(mail)) {
+            return INVALID_EMAIL_ADDRESS;
+        }
+
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setSubject("Welcome to Team Challenge");
+        simpleMailMessage.setText("Hello from Team Challenge, You successfully registered!");
+        simpleMailMessage.setTo(mail);
+        simpleMailMessage.setFrom(mailAddress);
+        javaMailSender.send(simpleMailMessage);
+        return "Mail sent successfully";
     }
 
     private String loadEmailTemplate() throws IOException {

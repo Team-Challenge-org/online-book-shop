@@ -21,9 +21,14 @@ import org.teamchallenge.bookshop.repository.TokenRepository;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
+import org.teamchallenge.bookshop.service.OAuth2Service;
+import org.teamchallenge.bookshop.service.SendMailService;
 
 import java.time.LocalDate;
 import java.util.UUID;
+
+import static org.teamchallenge.bookshop.constants.ValidationConstants.LOGOUT_FAILED;
+import static org.teamchallenge.bookshop.constants.ValidationConstants.LOGOUT_URL_NULL;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +39,8 @@ public class AuthServiceImpl implements AuthService {
     private final CartRepository cartRepository;
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
+    private final SendMailService sendMailService;
+    private final OAuth2Service oAuth2Service;
 
     @Override
     public AuthenticationResponse register(RegisterRequest registerRequest, UUID cartId) {
@@ -59,6 +66,8 @@ public class AuthServiceImpl implements AuthService {
             user.setCart(cart);
         }
         userRepository.save(user);
+        sendMailService.sendSuccessRegistrationEmail(registerRequest.getEmail());
+
         return AuthenticationResponse.builder()
                 .token(jwtService.generateJWT(user))
                 .build();
@@ -82,9 +91,38 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout(HttpServletRequest request) {
+    public String logout(HttpServletRequest request, String authType) {
+        String AuthTypeIgnoreCase = authType.toLowerCase();
+
+        return switch (AuthTypeIgnoreCase) {
+            case "jwt" -> {
+                logoutJwt(request);
+                yield null;
+            }
+            case "oauth2" -> logoutOAuth2(request);
+            default -> throw new IllegalArgumentException("Unsupported authType: " + authType);
+        };
+    }
+
+
+    private void logoutJwt(HttpServletRequest request) {
         String jwt = jwtService.extractTokenFromRequest(request);
         Token token = jwtService.blacklistToken(jwt);
         tokenRepository.save(token);
     }
+
+    private String logoutOAuth2(HttpServletRequest request) {
+        String provider = request.getParameter("provider");
+        if (provider == null || provider.isEmpty()) {
+            throw new IllegalArgumentException(LOGOUT_FAILED);
+        }
+        String logoutUrl = oAuth2Service.getLogoutUrl(provider);
+        if (logoutUrl == null || logoutUrl.isEmpty()) {
+            throw new IllegalArgumentException(LOGOUT_URL_NULL + provider);
+        }
+        return logoutUrl;
+    }
 }
+
+
+

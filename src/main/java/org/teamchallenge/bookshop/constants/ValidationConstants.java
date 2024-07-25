@@ -33,5 +33,8 @@ public interface ValidationConstants {
     String INVALID_RESET_TOKEN = "invalid or expired reset token ";
     String TOKEN_EXPIRED = "expired";
     String UNEXPECTED_ERROR_OCCURRED = "An unexpected error occurred";
+    String LOGOUT_URL_NULL = "Logout URL cannot be null or empty for provider: ";
+    String LOGOUT_FAILED = "OAuth2 logout failed";
+    String UNSUPPORTED_PROVIDER = "Unsupported provider: ";
 
 }

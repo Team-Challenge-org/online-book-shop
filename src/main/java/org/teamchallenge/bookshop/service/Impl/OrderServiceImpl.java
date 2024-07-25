@@ -26,9 +26,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
 
     @Override
-    public Optional<OrderDto> getOrderById(Long id) {
+    public OrderDto getOrderById(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(OrderIdNotFoundException::new);
-        return Optional.of(orderMapper.toOrderDto(order));
+        return orderMapper.toOrderDto(order);
     }
 
 

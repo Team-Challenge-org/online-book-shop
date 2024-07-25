@@ -10,6 +10,8 @@ import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.OAuth2Service;
 
+import static org.teamchallenge.bookshop.constants.ValidationConstants.UNSUPPORTED_PROVIDER;
+
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,15 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         return AuthenticationResponse.builder()
                 .token(jwtService.generateJWT(user))
                 .build();
+    }
+
+    @Override
+    public String getLogoutUrl(String provider) {
+        return switch (provider) {
+            case "google" -> "https://accounts.google.com/Logout";
+            case "facebook" -> "https://www.facebook.com/logout.php";
+            default -> throw new IllegalArgumentException(UNSUPPORTED_PROVIDER + provider);
+        };
     }
 
 }

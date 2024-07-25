@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.teamchallenge.bookshop.Oauth2.CustomOAuth2User;
 import org.teamchallenge.bookshop.Oauth2.CustomOAuth2UserService;
@@ -67,7 +68,15 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
                         .permitAll()
+
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.sendRedirect("/");
+                        })
+                )
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -79,6 +88,7 @@ public class SecurityConfig {
     private void oauth2AuthenticationSuccessHandler(HttpServletRequest request,
                                                     HttpServletResponse response,
                                                     Authentication authentication) throws IOException, ServletException {
+
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         OAuth2UserInfo userInfo = new OAuth2UserInfo();
         userInfo.setSurname(oAuth2User.getSurname());

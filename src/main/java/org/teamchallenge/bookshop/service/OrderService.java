@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface OrderService {
-    Optional<OrderDto> getOrderById(Long id);
+    OrderDto getOrderById(Long id);
 
     OrderDto updateOrder(Long id, OrderDto orderDto);
 
