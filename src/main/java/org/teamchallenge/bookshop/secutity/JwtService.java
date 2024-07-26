@@ -6,7 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.teamchallenge.bookshop.exception.SecretKeyNotFoundException;
@@ -22,31 +22,54 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.teamchallenge.bookshop.constants.ValidationConstants.INVALID_JWT_TOKEN;
+
 @Service
-@RequiredArgsConstructor
 public class JwtService {
-        private final TokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
+    private final SecretKey signingKey;
 
     private static final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
             .orElseThrow(SecretKeyNotFoundException::new);
 
-
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
+
+    @Autowired
+    public JwtService(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public String extractUsername(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSignInKey())
+                .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
         if (claims.containsKey("email")) {
             return claims.get("email", String.class);
-        }
-        else if (claims.containsKey("phoneNumber")) {
+        } else if (claims.containsKey("phoneNumber")) {
             return claims.get("phoneNumber", String.class);
-        }
-        else {
+        } else {
             return claims.getSubject();
         }
+    }
+
+    public String extractProviderFromToken(String token) {
+        if (isJwt(token)) {
+            return "jwt";
+        } else if (token.startsWith("ya29.")) {
+            return "google";
+        } else if (token.startsWith("EAAB")) {
+            return "facebook";
+        }
+        return null;
+    }
+
+    private boolean isJwt(String token) {
+        String[] parts = token.split("\\.");
+        return parts.length == 3;
     }
 
     public String generateJWT(User user) {
@@ -65,21 +88,17 @@ public class JwtService {
                 .claims(claims)
                 .subject(subject)
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSignInKey(), Jwts.SIG.HS256)
+                .signWith(signingKey)
                 .compact();
     }
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token);
+            Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(token);
             return true;
-        } catch ( JwtException e) {
+        } catch (JwtException e) {
             return false;
         }
-    }
-    private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String extractTokenFromRequest(HttpServletRequest request) {
@@ -91,14 +110,22 @@ public class JwtService {
     }
 
     public Token blacklistToken(String jwt) {
-        Claims payload = Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(jwt).getPayload();
-        LocalDateTime localDateTime = payload.getExpiration().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        return new Token(jwt, localDateTime);
+        try {
+            Claims payload = Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(jwt).getPayload();
+            LocalDateTime expiryDate = payload.getExpiration().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+
+            Token token = new Token(jwt, expiryDate);
+            token.setRevoked(true);
+
+            return tokenRepository.save(token);
+        } catch (JwtException e) {
+            throw new IllegalArgumentException(INVALID_JWT_TOKEN, e);
+        }
     }
+
     public boolean isTokenBlacklisted(String jwt) {
-        Token token = tokenRepository.findByToken(jwt);
-        return token != null;
+        return tokenRepository.findByTokenValueAndRevokedTrue(jwt).isPresent();
     }
 }

@@ -31,6 +31,7 @@ public interface ValidationConstants {
     String PASSWORD_RESTED = "Password rested successfully";
     String PASSWORD_SAVED = "Password saved successfully";
     String INVALID_RESET_TOKEN = "invalid or expired reset token ";
+    String INVALID_JWT_TOKEN = "invalid jwt token ";
     String TOKEN_EXPIRED = "expired";
     String UNEXPECTED_ERROR_OCCURRED = "An unexpected error occurred";
     String LOGOUT_URL_NULL = "Logout URL cannot be null or empty for provider: ";

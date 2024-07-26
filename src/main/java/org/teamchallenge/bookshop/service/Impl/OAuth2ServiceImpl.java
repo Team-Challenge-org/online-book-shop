@@ -23,13 +23,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     @Override
     public AuthenticationResponse processOAuth2Authentication(OAuth2UserInfo oauth2UserInfo) {
         User user = userRepository.findByEmail(oauth2UserInfo.getEmail())
-                .map(existingUser -> {
-                    existingUser.setName(oauth2UserInfo.getName());
-                    existingUser.setSurname(oauth2UserInfo.getSurname());
-                    existingUser.setProvider(oauth2UserInfo.getProvider());
-                    existingUser.setProviderId(oauth2UserInfo.getProviderId());
-                    return userRepository.save(existingUser);
-                })
+                .map(existingUser -> updateExistingUser(existingUser, oauth2UserInfo))
                 .orElseGet(() -> userCreationService.createNewUser(oauth2UserInfo));
 
         return AuthenticationResponse.builder()
@@ -37,6 +31,13 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 .build();
     }
 
+    private User updateExistingUser(User existingUser, OAuth2UserInfo oauth2UserInfo) {
+        existingUser.setName(oauth2UserInfo.getName());
+        existingUser.setSurname(oauth2UserInfo.getSurname());
+        existingUser.setProvider(oauth2UserInfo.getProvider());
+        existingUser.setProviderId(oauth2UserInfo.getProviderId());
+        return userRepository.save(existingUser);
+    }
     @Override
     public String getLogoutUrl(String provider) {
         return switch (provider) {

@@ -1,11 +1,15 @@
 package org.teamchallenge.bookshop.service.Impl;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.teamchallenge.bookshop.enums.Role;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
@@ -21,14 +25,10 @@ import org.teamchallenge.bookshop.repository.TokenRepository;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
-import org.teamchallenge.bookshop.service.OAuth2Service;
 import org.teamchallenge.bookshop.service.SendMailService;
 
 import java.time.LocalDate;
 import java.util.UUID;
-
-import static org.teamchallenge.bookshop.constants.ValidationConstants.LOGOUT_FAILED;
-import static org.teamchallenge.bookshop.constants.ValidationConstants.LOGOUT_URL_NULL;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +40,8 @@ public class AuthServiceImpl implements AuthService {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final SendMailService sendMailService;
-    private final OAuth2Service oAuth2Service;
+
+    private final RestTemplate restTemplate;
 
     @Override
     public AuthenticationResponse register(RegisterRequest registerRequest, UUID cartId) {
@@ -90,38 +91,55 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    @Override
-    public String logout(HttpServletRequest request, String authType) {
-        String AuthTypeIgnoreCase = authType.toLowerCase();
+    public void logout(String token) {
+        String provider = jwtService.extractProviderFromToken(token);
+        switch (provider) {
+            case "jwt":
+                handleJwtLogout(token);
+                break;
+            case "google":
+                handleGoogleLogout(token);
+                break;
+            case "facebook":
+                handleFacebookLogout(token);
+                break;
+            default:
+                throw new RuntimeException("Unsupported token provider");
+        }
+    }
 
-        return switch (AuthTypeIgnoreCase) {
-            case "jwt" -> {
-                logoutJwt(request);
-                yield null;
+    private void handleJwtLogout(String token) {
+        Token blacklistedToken = jwtService.blacklistToken(token);
+        tokenRepository.save(blacklistedToken);
+    }
+
+    private void handleGoogleLogout(String token) {
+        String revokeEndpoint = "https://accounts.google.com/o/oauth2/revoke?token=" + token;
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(revokeEndpoint, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Failed to revoke Google token");
             }
-            case "oauth2" -> logoutOAuth2(request);
-            default -> throw new IllegalArgumentException("Unsupported authType: " + authType);
-        };
-    }
-
-
-    private void logoutJwt(HttpServletRequest request) {
-        String jwt = jwtService.extractTokenFromRequest(request);
-        Token token = jwtService.blacklistToken(jwt);
-        tokenRepository.save(token);
-    }
-
-    private String logoutOAuth2(HttpServletRequest request) {
-        String provider = request.getParameter("provider");
-        if (provider == null || provider.isEmpty()) {
-            throw new IllegalArgumentException(LOGOUT_FAILED);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during Google logout", e);
         }
-        String logoutUrl = oAuth2Service.getLogoutUrl(provider);
-        if (logoutUrl == null || logoutUrl.isEmpty()) {
-            throw new IllegalArgumentException(LOGOUT_URL_NULL + provider);
-        }
-        return logoutUrl;
     }
+
+    private void handleFacebookLogout(String token) {
+        String revokeEndpoint = "https://graph.facebook.com/v20.0/me/permissions?access_token=" + token;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = restTemplate.exchange(revokeEndpoint, HttpMethod.DELETE, entity, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Failed to revoke Facebook token");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error during Facebook logout", e);
+        }
+    }
+
 }
 
 

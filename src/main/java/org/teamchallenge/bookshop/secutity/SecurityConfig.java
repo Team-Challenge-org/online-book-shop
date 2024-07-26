@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.secutity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +16,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.teamchallenge.bookshop.Oauth2.CustomOAuth2User;
 import org.teamchallenge.bookshop.Oauth2.CustomOAuth2UserService;
@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/v2/api-docs",
+                                "/oauth2/success",
                                 "/"
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -87,7 +88,7 @@ public class SecurityConfig {
 
     private void oauth2AuthenticationSuccessHandler(HttpServletRequest request,
                                                     HttpServletResponse response,
-                                                    Authentication authentication) throws IOException, ServletException {
+                                                    Authentication authentication) throws IOException {
 
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         OAuth2UserInfo userInfo = new OAuth2UserInfo();
@@ -99,6 +100,7 @@ public class SecurityConfig {
 
         AuthenticationResponse authResponse = oAuth2Service.processOAuth2Authentication(userInfo);
 
-        response.sendRedirect("/oauth2/success?token=" + authResponse.getToken());
+        response.setContentType("application/json");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(authResponse));
     }
 }

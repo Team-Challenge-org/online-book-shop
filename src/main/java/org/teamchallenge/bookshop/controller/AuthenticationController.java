@@ -2,19 +2,17 @@ package org.teamchallenge.bookshop.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
 import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
+import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.AuthService;
 import org.teamchallenge.bookshop.service.OAuth2Service;
 
-import java.net.URI;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +21,8 @@ import java.util.UUID;
 public class AuthenticationController {
     private final AuthService authService;
     private final OAuth2Service oAuth2Service;
-    ;
+    private final JwtService jwtService;
+
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
@@ -39,20 +38,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-            HttpServletRequest request,
-            @RequestParam String authType) {
-
-        String redirectUrl = authService.logout(request, authType);
-        if (redirectUrl != null) {
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create(redirectUrl))
-                    .build();
-        } else {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String token = jwtService.extractTokenFromRequest(request);
+        if (token == null) {
+            return ResponseEntity.badRequest().build();
         }
-    }
 
+        authService.logout(token);
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping("/oauth2/success")
     public ResponseEntity<AuthenticationResponse> oauth2AuthenticationSuccess(@RequestBody OAuth2UserInfo oauth2UserInfo) {
