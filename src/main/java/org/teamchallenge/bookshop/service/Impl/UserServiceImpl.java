@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.service.Impl;
 
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -40,10 +41,7 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    @Override
-    public Optional<User> getUserById(Long id) {
-        return Optional.of(userRepository.findById(id)).orElseThrow(UserNotFoundException::new);
-    }
+
 
     @Override
     @Transactional
@@ -63,10 +61,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
 
     @Override
     public Optional<User> findUserByEmail(String email) {
@@ -112,5 +106,4 @@ public class UserServiceImpl implements UserService {
         String email = authentication.getName();
         return findUserByEmail(email).orElseThrow(UserNotAuthenticatedException::new);
     }
-
 }

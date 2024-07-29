@@ -37,5 +37,5 @@ public interface ValidationConstants {
     String LOGOUT_URL_NULL = "Logout URL cannot be null or empty for provider: ";
     String LOGOUT_FAILED = "OAuth2 logout failed";
     String UNSUPPORTED_PROVIDER = "Unsupported provider: ";
-
+    String PAYMENT_NOT_FOUND = "Payment not found";
 }

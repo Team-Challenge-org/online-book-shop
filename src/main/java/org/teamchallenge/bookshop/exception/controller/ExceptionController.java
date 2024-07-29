@@ -107,4 +107,9 @@ public class ExceptionController {
         ErrorObject successObject = createErrorObject(ex.getMessage(), ex.getStatus());
         return new ResponseEntity<>(successObject, ex.getStatus());
     }
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<ErrorObject> handleSuccessResponse(PaymentNotFoundException e) {
+        return handleException(e, PAYMENT_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+
 }

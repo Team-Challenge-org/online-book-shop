@@ -18,6 +18,13 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    @OneToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+    private String stripePaymentIntentId;
     @ElementCollection
     @MapKeyJoinColumn(name = "books.id")
     @Column(name = "count")

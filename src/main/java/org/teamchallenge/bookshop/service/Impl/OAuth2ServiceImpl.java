@@ -38,13 +38,5 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         existingUser.setProviderId(oauth2UserInfo.getProviderId());
         return userRepository.save(existingUser);
     }
-    @Override
-    public String getLogoutUrl(String provider) {
-        return switch (provider) {
-            case "google" -> "https://accounts.google.com/Logout";
-            case "facebook" -> "https://www.facebook.com/logout.php";
-            default -> throw new IllegalArgumentException(UNSUPPORTED_PROVIDER + provider);
-        };
-    }
 
 }

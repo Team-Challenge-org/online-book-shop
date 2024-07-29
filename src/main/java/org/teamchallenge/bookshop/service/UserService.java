@@ -10,13 +10,11 @@ import java.util.Optional;
 public interface UserService {
     List<BookDto> getFavouriteBooks();
 
-    Optional<User> getUserById(Long id);
 
     UserDto updateUser(UserDto userDto);
 
     void deleteUser(Long id);
 
-    List<User> getAllUsers();
     UserDto getUserByToken(String jwt);
 
     User getAuthenticatedUser();
@@ -27,4 +25,5 @@ public interface UserService {
 
     void deleteBookFromFavourites(Long id);
     UserDto findUserById(Long id);
+
 }

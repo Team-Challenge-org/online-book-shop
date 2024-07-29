@@ -1,16 +1,15 @@
 package org.teamchallenge.bookshop.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.teamchallenge.bookshop.enums.Role;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -30,6 +29,7 @@ public class User   {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'USER'")
     private Role role;
+
     @ManyToMany
     @JoinTable(name = "users_books",
     joinColumns = @JoinColumn(name = "user_id"),

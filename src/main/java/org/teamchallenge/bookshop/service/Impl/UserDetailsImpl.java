@@ -26,12 +26,6 @@ public class UserDetailsImpl implements UserDetailsService {
         return buildUserDetails(user);
     }
 
-    public UserDetails loadUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-
-        return buildUserDetails(user);
-    }
 
     private UserDetails buildUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
@@ -39,5 +33,12 @@ public class UserDetailsImpl implements UserDetailsService {
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
         );
+    }
+
+    public UserDetails loadUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        return buildUserDetails(user);
     }
 }

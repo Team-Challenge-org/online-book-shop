@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -65,9 +66,15 @@ public class UserController {
         UserDto userDto = userService.findUserById(id);
         return ResponseEntity.ok(userDto);
     }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteUserById(@Valid @PathVariable Long id){
+      userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
     @GetMapping("/userByToken")
     public ResponseEntity<UserDto> getUserDataByToken(@RequestParam String token) {
         UserDto userDto = userService.getUserByToken(token);
         return ResponseEntity.ok(userDto);
     }
+
 }
