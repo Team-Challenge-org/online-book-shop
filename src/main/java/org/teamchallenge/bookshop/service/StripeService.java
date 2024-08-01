@@ -6,6 +6,6 @@ import com.stripe.model.PaymentIntent;
 import java.math.BigDecimal;
 
 public interface StripeService {
-    PaymentIntent createPaymentIntent(BigDecimal amount, String currency) throws StripeException;
+    PaymentIntent createPaymentIntent(BigDecimal amount, String currency, String paymentMethodId) throws StripeException;
     PaymentIntent confirmPayment(String paymentIntentId) throws StripeException;
 }

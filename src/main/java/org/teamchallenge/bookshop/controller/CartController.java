@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.teamchallenge.bookshop.dto.CartDto;
+import org.teamchallenge.bookshop.enums.Discount;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.CartService;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,7 +71,29 @@ public class CartController {
                 .map(id -> ResponseEntity.ok(cartService.updateQuantity(id, bookId, quantity)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build());
     }
-
+    @Operation(summary = "Calculate total price",
+            description = "Calculate the total price of items in the cart",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping("/total")
+    public ResponseEntity<BigDecimal> calculateTotalPrice(
+            @Parameter(description = "Id of cart")
+            @RequestParam UUID cartId) {
+        BigDecimal totalPrice = cartService.calculateTotalPrice(cartId);
+        return ResponseEntity.ok(totalPrice);
+    }
+    @PutMapping("/applyDiscount")
+    public ResponseEntity<CartDto> applyDiscount(
+            @Parameter(description = "Id of cart")
+            @CookieValue(required = false, name = "cartId") UUID cartId,
+            @RequestParam Discount discount,
+            HttpServletRequest request) {
+        return extractCartId(request, cartId)
+                .map(id -> {
+                    cartService.applyDiscount(id, discount);
+                    return ResponseEntity.ok(cartService.getCartById(id));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build());
+    }
     @Operation(summary = "Delete book from cart",
             security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("/delete")

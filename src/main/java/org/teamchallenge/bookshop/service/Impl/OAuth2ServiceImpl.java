@@ -10,8 +10,6 @@ import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.OAuth2Service;
 
-import static org.teamchallenge.bookshop.constants.ValidationConstants.UNSUPPORTED_PROVIDER;
-
 
 @Service
 @RequiredArgsConstructor

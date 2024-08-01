@@ -3,6 +3,7 @@ package org.teamchallenge.bookshop.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.teamchallenge.bookshop.enums.Discount;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public class Cart {
     @MapKeyJoinColumn(name = "books.id")
     @Column(name = "count")
     private Map<Book, Integer> items = new HashMap<>();
-
+    @Enumerated(EnumType.STRING)
+    private Discount discount = Discount.NONE;
 
 }

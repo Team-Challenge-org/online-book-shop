@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class CreatePaymentResponse {
-    private String clientSecret;
+    private String paymentIntentId;
 
 }

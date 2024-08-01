@@ -9,5 +9,5 @@ public interface OrderService {
 
     void deleteOrder(Long id);
 
-    OrderDto createOrder(OrderDto orderDto);
+    void createOrder(OrderDto orderDto);
 }

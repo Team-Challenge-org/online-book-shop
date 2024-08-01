@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.dto.CartDto;
+import org.teamchallenge.bookshop.enums.Discount;
+import org.teamchallenge.bookshop.exception.CartNotFoundException;
 import org.teamchallenge.bookshop.exception.NotFoundException;
 import org.teamchallenge.bookshop.mapper.CartMapper;
 import org.teamchallenge.bookshop.model.Book;
@@ -14,6 +16,7 @@ import org.teamchallenge.bookshop.repository.CartRepository;
 import org.teamchallenge.bookshop.service.CartService;
 import org.teamchallenge.bookshop.service.UserService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -87,5 +90,23 @@ public class CartServiceImpl implements CartService {
     private void deleteBook(Cart cart, Book book) {
         cart.getItems().remove(book);
         cart.setLastModified(LocalDate.now());
+    }
+    public BigDecimal calculateTotalPrice(UUID cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(CartNotFoundException::new);
+        BigDecimal totalPrice = cart.getItems().entrySet().stream()
+                .map(entry -> entry.getKey().getPrice().multiply(BigDecimal.valueOf(entry.getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (cart.getDiscount() != null && cart.getDiscount() != Discount.NONE) {
+            int discountPercentage = cart.getDiscount().getPercentage();
+            BigDecimal discountAmount = totalPrice.multiply(BigDecimal.valueOf(discountPercentage)).divide(BigDecimal.valueOf(100));
+            totalPrice = totalPrice.subtract(discountAmount);
+        }
+        return totalPrice;
+    }
+    public void applyDiscount(UUID cartId, Discount discount) {
+        Cart cart = cartRepository.findById(cartId).orElseThrow(CartNotFoundException::new);
+        cart.setDiscount(discount);
+        cartRepository.save(cart);
     }
 }

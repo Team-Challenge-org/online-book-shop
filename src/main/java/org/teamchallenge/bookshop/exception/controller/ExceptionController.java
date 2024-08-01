@@ -89,6 +89,10 @@ public class ExceptionController {
     public ResponseEntity<ErrorObject> missingRefreshAccessToken(AccessTokenRefreshException e) {
         return handleException(e, MISSING_REFRESH_ACCESS_TOKEN, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(CartNotFoundException.class)
+    public ResponseEntity<ErrorObject> cartNotFound(CartNotFoundException e) {
+        return handleException(e, CART_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorObject> invalidResetToken(InvalidTokenException e) {
         return handleException(e, INVALID_RESET_TOKEN, HttpStatus.BAD_REQUEST);

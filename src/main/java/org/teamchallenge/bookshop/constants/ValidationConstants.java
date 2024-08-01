@@ -14,6 +14,7 @@ public interface ValidationConstants {
     String WRONG_PASSWORD_CREATION_MESSAGE = "The password must consist of at least 6 characters. Contain a number and one capital letter";
     String USER_NOT_AUTHENTICATED = "User is not authenticated";
     String SECRET_KEY_NOT_FOUND = "Secret Key in getenv not found";
+    String CART_ID_NOT_FOUND = "Cart id not found";
     String CART_NOT_FOUND = "Cart not found";
     String DROPBOX_IMAGE_NOT_FOUND = "Dropbox image not found";
     String DROPBOX_FOLDER_NOT_FOUND = "Dropbox image not found";

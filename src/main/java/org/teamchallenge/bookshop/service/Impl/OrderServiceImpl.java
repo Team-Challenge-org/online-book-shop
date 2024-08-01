@@ -68,11 +68,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto createOrder(OrderDto orderDto) {
+    public void createOrder(OrderDto orderDto) {
         Order order = new Order();
         order.setStatus(orderDto.status());
         order.setStatusChange(LocalDateTime.now());
 
-        return getOrderDto(orderDto, order);
+        getOrderDto(orderDto, order);
     }
 }

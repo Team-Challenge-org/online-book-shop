@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class CreatePaymentRequest  {
+    private String paymentMethodId;
     private BigDecimal amount;
     private String currency;
 
