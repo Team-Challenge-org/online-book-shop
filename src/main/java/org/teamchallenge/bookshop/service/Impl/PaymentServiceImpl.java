@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.enums.OrderStatus;
 import org.teamchallenge.bookshop.exception.OrderIdNotFoundException;
 import org.teamchallenge.bookshop.exception.PaymentNotFoundException;
-import org.teamchallenge.bookshop.exception.UserNotFoundException;
 import org.teamchallenge.bookshop.model.Order;
 import org.teamchallenge.bookshop.model.Payment;
 import org.teamchallenge.bookshop.model.User;
@@ -17,7 +16,6 @@ import org.teamchallenge.bookshop.model.request.paymentStripeDto.CreatePaymentRe
 import org.teamchallenge.bookshop.model.request.paymentStripeDto.CreatePaymentResponse;
 import org.teamchallenge.bookshop.repository.OrderRepository;
 import org.teamchallenge.bookshop.repository.PaymentRepository;
-import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.service.PaymentService;
 import org.teamchallenge.bookshop.service.StripeService;
 

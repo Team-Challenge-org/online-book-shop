@@ -15,7 +15,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetailsService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -25,20 +25,16 @@ public class UserDetailsImpl implements UserDetailsService {
 
         return buildUserDetails(user);
     }
-
-
     private UserDetails buildUserDetails(User user) {
+        String emailOrPhone = user.getEmail() != null ? user.getEmail() : user.getPhoneNumber();
+
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                emailOrPhone,
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
         );
     }
 
-    public UserDetails loadUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
 
-        return buildUserDetails(user);
-    }
+
 }
