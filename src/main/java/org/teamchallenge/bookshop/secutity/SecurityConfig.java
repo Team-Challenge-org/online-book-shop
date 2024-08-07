@@ -19,7 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.teamchallenge.bookshop.Oauth2.CustomOAuth2User;
 import org.teamchallenge.bookshop.Oauth2.CustomOAuth2UserService;
 import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
-import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
+import org.teamchallenge.bookshop.model.request.AuthResponse;
 import org.teamchallenge.bookshop.service.OAuth2Service;
 
 import java.io.IOException;
@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
@@ -71,7 +72,7 @@ public class SecurityConfig {
         userInfo.setProvider(oAuth2User.getProvider());
         userInfo.setProviderId(oAuth2User.getProviderId());
 
-        AuthenticationResponse authResponse = oAuth2Service.processOAuth2Authentication(userInfo);
+        AuthResponse authResponse = oAuth2Service.processOAuth2Authentication(userInfo);
 
         response.setContentType("application/json");
         response.getWriter().write(new ObjectMapper().writeValueAsString(authResponse));

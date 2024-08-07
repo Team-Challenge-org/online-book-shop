@@ -1,24 +1,15 @@
 package org.teamchallenge.bookshop.service.Impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.teamchallenge.bookshop.enums.Role;
-import org.teamchallenge.bookshop.exception.NotFoundException;
-import org.teamchallenge.bookshop.exception.UserAlreadyExistsException;
-import org.teamchallenge.bookshop.exception.UserNotFoundException;
+import org.teamchallenge.bookshop.exception.*;
 import org.teamchallenge.bookshop.model.Cart;
 import org.teamchallenge.bookshop.model.Token;
 import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.model.request.AuthRequest;
-import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
+import org.teamchallenge.bookshop.model.request.AuthResponse;
 import org.teamchallenge.bookshop.model.request.RegisterRequest;
 import org.teamchallenge.bookshop.repository.CartRepository;
 import org.teamchallenge.bookshop.repository.TokenRepository;
@@ -28,117 +19,114 @@ import org.teamchallenge.bookshop.service.AuthService;
 import org.teamchallenge.bookshop.service.SendMailService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.teamchallenge.bookshop.constants.ValidationConstants.*;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
     private final CartRepository cartRepository;
-    private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final SendMailService sendMailService;
+    private final TokenRepository tokenRepository;
 
-    private final RestTemplate restTemplate;
 
     @Override
-    public AuthenticationResponse register(RegisterRequest registerRequest, UUID cartId) {
+    public AuthResponse register(RegisterRequest registerRequest, UUID cartId) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException();
         }
+
         User user = new User();
         user.setName(registerRequest.getFirstName());
         user.setSurname(registerRequest.getSurname());
         user.setEmail(registerRequest.getEmail());
         user.setPhoneNumber(registerRequest.getPhoneNumber());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(Role.USER);
-        Cart cart;
-        if (cartId != null) {
-            cart = cartRepository.findById(cartId).orElseThrow(NotFoundException::new);
-            user.setCart(cart);
-        } else {
-            cart = new Cart();
-            cart.setIsPermanent(true);
-            cart.setLastModified(LocalDate.now());
-            cartRepository.save(cart);
-            user.setCart(cart);
-        }
-        userRepository.save(user);
-        sendMailService.sendSuccessRegistrationEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        return AuthenticationResponse.builder()
-                .token(jwtService.generateJWT(user))
+        Cart cart = cartId != null
+                ? cartRepository.findById(cartId).orElseThrow(NotFoundException::new)
+                : createNewCart();
+
+        user.setCart(cart);
+        userRepository.save(user);
+
+        sendMailService.sendSuccessRegistrationEmail(registerRequest.getEmail());
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+
+        saveRefreshToken(user,refreshToken);
+        return AuthResponse.builder()
+                .token(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
-    @Override
-    public AuthenticationResponse auth(AuthRequest authRequest) {
-        User user = userRepository.findByEmailOrPhoneNumber(authRequest.getEmailOrPhone())
+    private Cart createNewCart() {
+        Cart cart = new Cart();
+        cart.setIsPermanent(true);
+        cart.setLastModified(LocalDate.now());
+        return cartRepository.save(cart);
+    }
+@Override
+    public AuthResponse login(AuthRequest loginRequest) {
+        User user = userRepository.findByEmailOrPhoneNumber(loginRequest.getEmailOrPhone())
                 .orElseThrow(UserNotFoundException::new);
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        authRequest.getEmailOrPhone(),
-                        authRequest.getPassword()
-                )
-        );
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            throw new InvalidPassword();
+        }
 
-        return AuthenticationResponse.builder()
-                .token(jwtService.generateJWT(user))
-                .build();
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        saveRefreshToken(user,refreshToken);
+    return AuthResponse.builder()
+            .token(accessToken)
+            .refreshToken(refreshToken)
+            .build();
     }
 
+    private void saveRefreshToken(User user, String refreshToken) {
+        Token token = new Token();
+        token.setTokenValue(refreshToken);
+        token.setExpiryDate(LocalDateTime.now().plusDays(7));
+        token.setRevoked(false);
+        user.addToken(token);
+        userRepository.save(user);
+    }
+@Override
     public void logout(String token) {
-        String provider = jwtService.extractProviderFromToken(token);
-        switch (provider) {
-            case "jwt":
-                handleJwtLogout(token);
-                break;
-            case "google":
-                handleGoogleLogout(token);
-                break;
-            case "facebook":
-                handleFacebookLogout(token);
-                break;
-            default:
-                throw new RuntimeException("Unsupported token provider");
+        jwtService.revokeToken(token);
+    Token tokenEntity = tokenRepository.findByTokenValue(token)
+            .orElseThrow(InvalidTokenException::new);
+    User user = tokenEntity.getUser();
+    user.removeToken(tokenEntity);
+    userRepository.save(user);
+    }
+@Override
+    public AuthResponse refreshToken(String refreshToken) {
+        if (!jwtService.isTokenValid(refreshToken)) {
+            throw new RuntimeException(INVALID_RESET_TOKEN);
         }
+
+        String username = jwtService.extractUsername(refreshToken);
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(UserNotFoundException::new);
+
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+
+        jwtService.revokeToken(refreshToken);
+
+        return new AuthResponse(newAccessToken, newRefreshToken);
     }
 
-    private void handleJwtLogout(String token) {
-        Token blacklistedToken = jwtService.blacklistToken(token);
-        tokenRepository.save(blacklistedToken);
-    }
-
-    private void handleGoogleLogout(String token) {
-        String revokeEndpoint = "https://accounts.google.com/o/oauth2/revoke?token=" + token;
-        try {
-            ResponseEntity<String> response = restTemplate.getForEntity(revokeEndpoint, String.class);
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Failed to revoke Google token");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error during Google logout", e);
-        }
-    }
-
-    private void handleFacebookLogout(String token) {
-        String revokeEndpoint = "https://graph.facebook.com/v20.0/me/permissions?access_token=" + token;
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<String> response = restTemplate.exchange(revokeEndpoint, HttpMethod.DELETE, entity, String.class);
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Failed to revoke Facebook token");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error during Facebook logout", e);
-        }
-    }
 
 }
 

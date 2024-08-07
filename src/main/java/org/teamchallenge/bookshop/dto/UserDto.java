@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import org.teamchallenge.bookshop.enums.Role;
 
 import java.util.List;
+
 public record UserDto(
         @NotNull() long id,
         String name,

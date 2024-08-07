@@ -25,6 +25,7 @@ public class User   {
     private String surname;
     @Column(name = "email",unique = true)
     private String email;
+    @Column(name = "phoneNumber",unique = true)
     private String phoneNumber;
     private String password;
     private String provider;
@@ -46,5 +47,16 @@ public class User   {
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "order_id"))
     private List<Order> orders = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Token> tokens = new ArrayList<>();
 
+    public void addToken(Token token) {
+        tokens.add(token);
+        token.setUser(this);
+    }
+
+    public void removeToken(Token token) {
+        tokens.remove(token);
+        token.setUser(null);
+    }
 }

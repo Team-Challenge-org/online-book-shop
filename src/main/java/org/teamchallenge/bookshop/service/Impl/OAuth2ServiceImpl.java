@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.teamchallenge.bookshop.Oauth2.UserCreationService;
 import org.teamchallenge.bookshop.dto.OAuth2UserInfo;
 import org.teamchallenge.bookshop.model.User;
-import org.teamchallenge.bookshop.model.request.AuthenticationResponse;
+import org.teamchallenge.bookshop.model.request.AuthResponse;
 import org.teamchallenge.bookshop.repository.UserRepository;
 import org.teamchallenge.bookshop.secutity.JwtService;
 import org.teamchallenge.bookshop.service.OAuth2Service;
@@ -19,13 +19,18 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     private final UserCreationService userCreationService;
 
     @Override
-    public AuthenticationResponse processOAuth2Authentication(OAuth2UserInfo oauth2UserInfo) {
+    public AuthResponse processOAuth2Authentication(OAuth2UserInfo oauth2UserInfo) {
         User user = userRepository.findByEmail(oauth2UserInfo.getEmail())
                 .map(existingUser -> updateExistingUser(existingUser, oauth2UserInfo))
                 .orElseGet(() -> userCreationService.createNewUser(oauth2UserInfo));
 
-        return AuthenticationResponse.builder()
-                .token(jwtService.generateJWT(user))
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return AuthResponse.builder()
+                .token(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 

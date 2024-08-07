@@ -29,6 +29,7 @@ public interface ValidationConstants {
     String INVALID_EMAIL_ADDRESS = "Invalid email address";
     String INVALID_PASSWORD = "Invalid password";
     String EMPTY_TOKEN = "Token cannot be empty";
+    String TOKEN_NOT_FOUND = "Token not found";
     String PASSWORD_RESTED = "Password rested successfully";
     String PASSWORD_SAVED = "Password saved successfully";
     String INVALID_RESET_TOKEN = "invalid or expired reset token ";

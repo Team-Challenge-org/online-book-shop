@@ -49,6 +49,10 @@ public class ExceptionController {
     public ResponseEntity<ErrorObject> bookNotFoundHandler(BookNotFoundException e) {
         return handleException(e, BOOK_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(InvalidPassword.class)
+    public ResponseEntity<ErrorObject> bookNotFoundHandler(InvalidPassword e) {
+        return handleException(e, INVALID_PASSWORD, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(BookTitleNotFoundException.class)
     public ResponseEntity<ErrorObject> bookTitleWrong(BookTitleNotFoundException e) {
         return handleException(e, BOOK_TITLE_WRONG, HttpStatus.NOT_FOUND);

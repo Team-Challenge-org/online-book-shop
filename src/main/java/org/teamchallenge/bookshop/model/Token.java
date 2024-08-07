@@ -21,13 +21,15 @@ public class Token {
 
     private LocalDateTime expiryDate;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean revoked;
+    @Column(nullable = false)
+    private boolean revoked = false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Token(String tokenValue, LocalDateTime expiryDate) {
         this.tokenValue = tokenValue;
         this.expiryDate = expiryDate;
-        this.revoked = false;
     }
 
 
