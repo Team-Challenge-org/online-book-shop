@@ -7,4 +7,6 @@ public interface ProfileService {
     ProfileUpdateDto updateProfile(ProfileUpdateDto profileDto);
 
     ProfileUpdateDto getUserData();
+
+    ProfileUpdateDto resetPassword(String password);
 }

@@ -44,4 +44,9 @@ public class ProfileController {
         ProfileUpdateDto profileUpdateDto = profileService.getUserData();
         return ResponseEntity.ok(profileUpdateDto);
     }
+
+    @PatchMapping("/reset-password")
+    public ProfileUpdateDto resetPasswordProfile(@RequestBody String password) {
+        return profileService.resetPassword(password);
+    }
 }

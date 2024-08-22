@@ -45,5 +45,10 @@ public class ProfileServiceImpl implements ProfileService {
         return profileMapper.toProfileUpdateDto(user);
     }
 
-
+    @Override
+    public ProfileUpdateDto resetPassword(String password) {
+        ProfileUpdateDto profile = getUserData();
+        profile.setPassword(password);
+        return profile;
+    }
 }
