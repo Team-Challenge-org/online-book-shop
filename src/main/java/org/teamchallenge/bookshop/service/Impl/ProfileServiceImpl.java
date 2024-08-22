@@ -52,9 +52,9 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void resetPassword(PasswordResetDto resetDto) {
         User user = userService.getAuthenticatedUser();
-        String encodedPassword = passwordEncoder.encode(resetDto.getOldPassword());
-        if(user.getPassword().equals(encodedPassword)) {
-            user.setPassword(resetDto.getNewPassword());
+        if(passwordEncoder.matches(resetDto.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(resetDto.getNewPassword()));
+            userService.updateUser(userMapper.entityToDto(user));
         } else {
             throw new WrongPasswordException("Old password is incorrect!");
         }
