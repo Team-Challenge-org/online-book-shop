@@ -39,4 +39,6 @@ public interface ValidationConstants {
     String LOGOUT_FAILED = "OAuth2 logout failed";
     String UNSUPPORTED_PROVIDER = "Unsupported provider: ";
     String PAYMENT_NOT_FOUND = "Payment not found";
+
+    String OLD_PASSWORD_INCORRECT = "Old password is incorrect!";
 }

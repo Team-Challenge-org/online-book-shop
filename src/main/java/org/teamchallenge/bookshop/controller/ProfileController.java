@@ -11,8 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.teamchallenge.bookshop.dto.PasswordResetDto;
 import org.teamchallenge.bookshop.dto.ProfileUpdateDto;
 import org.teamchallenge.bookshop.dto.UserDto;
+import org.teamchallenge.bookshop.model.User;
 import org.teamchallenge.bookshop.service.ProfileService;
 
 @RestController
@@ -46,7 +48,7 @@ public class ProfileController {
     }
 
     @PatchMapping("/reset-password")
-    public ProfileUpdateDto resetPasswordProfile(@RequestBody String password) {
-        return profileService.resetPassword(password);
+    public void resetPasswordProfile(@RequestBody PasswordResetDto resetDto) {
+        profileService.resetPassword(resetDto);
     }
 }

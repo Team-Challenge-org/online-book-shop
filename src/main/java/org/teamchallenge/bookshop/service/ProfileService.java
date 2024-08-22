@@ -1,5 +1,6 @@
 package org.teamchallenge.bookshop.service;
 
+import org.teamchallenge.bookshop.dto.PasswordResetDto;
 import org.teamchallenge.bookshop.dto.ProfileUpdateDto;
 import org.teamchallenge.bookshop.dto.UserDto;
 
@@ -8,5 +9,5 @@ public interface ProfileService {
 
     ProfileUpdateDto getUserData();
 
-    ProfileUpdateDto resetPassword(String password);
+    void resetPassword(PasswordResetDto resetDto);
 }

@@ -1,8 +1,11 @@
 package org.teamchallenge.bookshop.service.Impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.teamchallenge.bookshop.dto.PasswordResetDto;
 import org.teamchallenge.bookshop.dto.ProfileUpdateDto;
+import org.teamchallenge.bookshop.exception.WrongPasswordException;
 import org.teamchallenge.bookshop.mapper.ProfileMapper;
 import org.teamchallenge.bookshop.mapper.UserMapper;
 import org.teamchallenge.bookshop.model.Profile;
@@ -20,6 +23,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final UserService userService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ProfileUpdateDto updateProfile(ProfileUpdateDto profileUpdateDto) {
@@ -46,9 +50,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileUpdateDto resetPassword(String password) {
-        ProfileUpdateDto profile = getUserData();
-        profile.setPassword(password);
-        return profile;
+    public void resetPassword(PasswordResetDto resetDto) {
+        User user = userService.getAuthenticatedUser();
+        String encodedPassword = passwordEncoder.encode(resetDto.getOldPassword());
+        if(user.getPassword().equals(encodedPassword)) {
+            user.setPassword(resetDto.getNewPassword());
+        } else {
+            throw new WrongPasswordException("Old password is incorrect!");
+        }
     }
 }
