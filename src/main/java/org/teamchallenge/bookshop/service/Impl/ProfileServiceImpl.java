@@ -54,7 +54,7 @@ public class ProfileServiceImpl implements ProfileService {
         User user = userService.getAuthenticatedUser();
         if(passwordEncoder.matches(resetDto.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(resetDto.getNewPassword()));
-            userService.updateUser(userMapper.entityToDto(user));
+            userRepository.save(user);
         } else {
             throw new WrongPasswordException("Old password is incorrect!");
         }
