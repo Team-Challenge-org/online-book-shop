@@ -203,6 +203,13 @@ public class BookServiceImpl implements BookService {
         return new PageImpl<>(bookDtoList, pageable, totalCount);
     }
 
+    @Override
+    public List<BookDto> getBooksSortedByPriceDesc(Pageable pageable) {
+        return bookRepository.findAllByOrderByPriceDesc().stream()
+                .map(bookMapper::entityToDTO)
+                .toList();
+    }
+
 
     private List<Predicate> getPredicatesForBooks(CriteriaBuilder criteriaBuilder, Root<Book> root) {
         return List.of(criteriaBuilder.equal(root.get("isThisSlider"), false));

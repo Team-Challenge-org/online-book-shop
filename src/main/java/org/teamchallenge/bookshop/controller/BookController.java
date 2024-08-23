@@ -138,6 +138,14 @@ public class BookController {
         return ResponseEntity.ok(bookDtos);
     }
 
+    @GetMapping("/sorted-by-price")
+    public List<BookDto> getBooksSortedByPriceDesc(
+            @Parameter(description = "Number of page and it's size", example = "{\n \"size\" : 10,\n\"page\" : 0\n}")
+            Pageable pageable
+    ) {
+        return bookService.getBooksSortedByPriceDesc(pageable);
+    }
+
     @Operation(summary = "Get books for slider")
     @GetMapping("/slider")
     public ResponseEntity<List<BookInCatalogDto>> getBooksForSlider() {

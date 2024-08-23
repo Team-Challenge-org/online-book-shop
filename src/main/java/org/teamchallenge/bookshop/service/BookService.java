@@ -34,4 +34,6 @@ public interface BookService {
                             String author,
                             Float priceMin,
                             Float priceMax);
+
+    List<BookDto> getBooksSortedByPriceDesc(Pageable pageable);
 }
