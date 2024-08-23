@@ -139,7 +139,7 @@ public class BookController {
     }
 
     @GetMapping("/sorted-by-price")
-    public List<BookDto> getBooksSortedByPriceDesc(
+    public Page<BookDto> getBooksSortedByPriceDesc(
             @Parameter(description = "Number of page and it's size", example = "{\n \"size\" : 10,\n\"page\" : 0\n}")
             Pageable pageable
     ) {

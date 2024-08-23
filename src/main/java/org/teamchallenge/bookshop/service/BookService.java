@@ -35,5 +35,5 @@ public interface BookService {
                             Float priceMin,
                             Float priceMax);
 
-    List<BookDto> getBooksSortedByPriceDesc(Pageable pageable);
+    Page<BookDto> getBooksSortedByPriceDesc(Pageable pageable);
 }

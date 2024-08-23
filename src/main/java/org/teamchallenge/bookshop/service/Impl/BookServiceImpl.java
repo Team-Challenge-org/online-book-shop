@@ -204,10 +204,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> getBooksSortedByPriceDesc(Pageable pageable) {
-        return bookRepository.findAllByOrderByPriceDesc().stream()
-                .map(bookMapper::entityToDTO)
-                .toList();
+    public Page<BookDto> getBooksSortedByPriceDesc(Pageable pageable) {
+        return bookRepository.findAllByOrderByPriceDesc(pageable)
+                .map(bookMapper::entityToDTO);
     }
 
 

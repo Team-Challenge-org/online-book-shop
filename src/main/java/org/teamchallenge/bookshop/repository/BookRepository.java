@@ -1,5 +1,7 @@
 package org.teamchallenge.bookshop.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,5 +20,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b FROM Book b ORDER BY RANDOM() LIMIT :count")
     List<Book> getRandom(@Param("count") Integer count);
 
-    List<Book> findAllByOrderByPriceDesc();
+    Page<Book> findAllByOrderByPriceDesc(Pageable pageable);
 }
